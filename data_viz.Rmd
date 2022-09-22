@@ -322,3 +322,247 @@ ggplot(data = df_minors, aes(x = discipline,
 Question 3 (5 points). Push your .Rmd and knitted .html file to GitHub, writing a one sentence commit message for your push.
 
 Extra Credit (1 point). For just a single point of extra credit (the purpose of this is mostly to give anyone who finishes the quiz early something to work on), figure out the “average” number of majors SLU students had over the past 5 years. For example, if the data only had three students: two single majors and one double major, the “average” number of majors would be (1 + 1 + 2) / 4 = 1.33 majors.
+
+
+--------------------------------
+
+Take Home Quiz 3
+
+Question 1 (5 points). Consider the Challenger example in our course notes. Clearly, the graphic used to communicate the results is poorly made: it eliminates data points when it really should not. However, the engineers making the graph did not have “malicious intent:” they did not purposefully remove these data points to try to lie: it was a mistake. Is the visualization still unethical? Use principles from the Modern Data Science Readings to explain in a few sentences.
+
+The visualization was unethical because it was not clarified that those data points were not included, which goes against multiple principles including "Present our work in ways that empower others to make better-informed decisions.". Also, if such an error was not caught, they likely did not "Respect and invite fair criticism while promoting the identification and open discussion of errors, risks, and unintended consequences of our work."
+
+Question 2 (4 points). Find a graphic online, other than any given in our course readings, that is unethical. Provide a link to your graphic and give a 2-3 sentence description explaining why that graphic is not ethical.
+https://i.pinimg.com/originals/0c/ae/61/0cae6187effa5f31171fde69659193eb.png
+has a misleading y axis that mitigates the presentation of actual represenatitve data.
+
+Question 3 (3 points). Explain, in your own words, what each of the following Git terms mean:
+
+commit - save to github
+
+push - upload to github
+
+pull - download from github
+
+Question 4 (3 points). These three points are given if you successfully committed with a commit message and pushed your .Rmd and .html files to your GitHub account.
+
+---------------------------------
+
+In Class Quiz 3
+
+Question 1 (5 points). Suppose you do the following:
+
+You go to your GitHub site and make a change to the README file (adding a sentence, for example).
+In R Studio, you update one of your .Rmd files, adding a line of code and commit the file.
+You attempt to push the new file to your GitHub site.
+Once you get to the third step, you’ll get an error when you try to push. Why? What do you need to do first before you make the push in Step 3?
+
+
+Question 2 (6 points). Give 2 advantages of using Git and GitHub. These must be advantages that we discussed in class (so you should not simply google “advantages of Git” and give the first two things that pop up).
+
+Question 3 (6 points). Choose 1 of the 12 principles of the ethical practice of data science that you think is the most difficult to execute. Give a short, possibly hypothetical, example that illustrates how that principle could be difficult to follow.
+
+Question 4 (6 points). The authors of Data Feminism argued that data scientists should “embrace emotion,” not ignore it when building visuals. State the example that the authors used to show how emotion can be used to make a visual stronger. Then, give an argument against “embracing emotion.” In other words, give an argument that data visualizations should be devoid of emotion as much as possible, even if that’s not what you believe.
+
+Question 5 (2 points). These two points are given for committing your .Rmd and .html files with a commit message correctly, and pushing them to your GitHub site.
+
+
+
+-------------------------------------------
+
+6 MAPPING
+
+```{r}
+## install.packages("maps")
+library(maps)
+library(tidyverse)
+state_df <- ggplot2::map_data("state")
+ggplot(data = state_df,
+            mapping = aes(x = long, y = lat,
+                          group = group)) +
+  geom_polygon() 
+## better map version
+ggplot(data = state_df,
+            mapping = aes(x = long, y = lat,
+                          group = group)) +
+  geom_polygon(colour = "black", fill = "white") +
+  coord_map(projection = "albers", lat0 = 39, lat1 = 45) +
+  theme_void()
+## install.packages("usdata")
+library(usdata)
+state_stats
+state_stats <- state_stats %>% mutate(state = str_to_lower(state))
+state_full <- left_join(state_df, state_stats, by = c("region" = "state"))
+
+ggplot(data = state_full, aes(x = long, y = lat, group = group)) +
+  geom_polygon(colour = "black", aes(fill = coal)) +
+  coord_map(projection = "albers", lat0 = 39, lat1 = 45) +
+  theme_void() +
+  scale_fill_viridis_b()
+```
+
+Exercise 1. Which states had the fastest growth rate between 2000 and 2010? Make a variable for the percent change in population and then map this variable.
+```{r}
+state_full <- state_full %>% mutate(growth_rate = (pop2010 - pop2000)/pop2000)
+ggplot(data = state_full, aes(x = long, y = lat, group = group)) +
+  geom_polygon(colour = "black", aes(fill = growth_rate)) +
+  coord_map(projection = "albers", lat0 = 39, lat1 = 45) +
+  theme_void() +
+  scale_colour_viridis_d(palette = "Blues")
+```
+Arizona
+
+Exercise 2. To your map in Exercise 1, think about which type of colour scale makes the most sense to use (sequential, diverging, or unordered). Change the colour scale to match what makes the most sense.
+--------------
+You may have noticed a couple of additional problems in the United States maps we made in the previous section.
+
+We ignored Alaska and Hawaii. Putting these on the map in their geographic locations would result in a tiny continental United States map that would be harder to read.
+
+Some states in the Northeast are so small that their fill values are hard to read.
+
+Both of these issues can be challenging to address. It is common to put Hawaii and Alaska in a corner of the plot, even though their latitude and longitude values do not match. Sometimes Alaska is made to be smaller than its true size as well. The smaller Northeastern states is a more challenging problem. This is beyond the scope of this course (though not beyond the scope of part of a final project), but a hexbin map can solve both of these issues.
+
+Exercise 1. Think of a second example where, even though the data is spatial, the best graph to show a particular point would not be a map.
+
+
+Exercise 2. Refer back the United States examples that we completed in the earlier section. Choose a variable or two variables where a map makes the most sense to visualize that variable and explain your reasoning. Then, choose a variable or two variables where you might make a plot other than a map and explain your reasoning for why the map makes less sense for this variable.
+
+
+```{r}
+active <- read_csv("https://raw.githubusercontent.com/iramler/stlawu_covid/main/slc_towns_active_cases.csv", n_max = 34)
+tcases <- read_csv("https://raw.githubusercontent.com/iramler/stlawu_covid/main/slc_towns_total_cases.csv", n_max = 34)
+
+active_long <- active %>% pivot_longer(5:ncol(active), names_to = "date",
+                                       values_to = "cases")
+## repeat for total cases
+tcases_long <- tcases %>% pivot_longer(5:ncol(tcases), names_to = "date",
+                                       values_to = "cases")
+
+library(lubridate)
+covid_df <- left_join(tcases_long, active_long,
+                      by = c("date", "Order", "NAME")) %>%
+  mutate(date = mdy(date)) %>%
+  rename(total_cases = cases.x,
+         active_cases = cases.y) %>%
+  mutate(total_cases = if_else(is.na(total_cases),
+                               true = 0, false = total_cases),
+         active_cases = if_else(is.na(active_cases),
+                                      true = 0, false = active_cases))
+  
+
+covid_SLC <- covid_df %>% filter(NAME == "St. Lawrence County")
+covid_sub <- covid_df %>% filter(NAME != "St. Lawrence County")
+```
+
+Exercise 1. Make a line plot that shows the number of active_cases in all of St. Lawrence County over time.
+```{r}
+ggplot(data = covid_SLC, aes(x = date, y = active_cases)) +
+  geom_point()
+```
+
+
+```{r}
+## install.packages("sf")
+library(sf)
+shp <- read_sf("data/SLC_Civil_Boundaries_SHP/slc.shp") %>%
+  st_transform(st_crs("+proj=longlat"))
+ggplot(data = shp) +
+  geom_sf() +
+  theme_void()
+full_df <- left_join(shp, covid_sub, by = "NAME") %>%
+  filter(date == max(date)) ## only plot cases on the most recent date
+ggplot(data = full_df) +
+  geom_sf(aes(fill = active_cases)) +
+  theme_void()
+```
+Exercise 2. Change the fill scale of the plot. Should you use an unordered, sequential, or diverging scale?
+
+Exercise 3. Change the colour scale so that active_cases are put into different bins with scale_fill_viridis_b(). What are some advantages and disadvantages of this?
+```{r}
+ggplot(data = full_df) +
+  geom_sf(aes(fill = active_cases)) +
+  theme_void() +
+  scale_fill_viridis_b()
+```
+Clearly differentiates ranges, but not visually clear differences within bins.
+
+Exercise 4. Explore the ?geom_sf_text() function and add the actual number of cases to the subregions in the plot, as is done on the SLC website.
+```{r}
+ggplot(data = full_df) +
+  geom_sf(aes(fill = active_cases)) +
+  theme_void() +
+  geom_sf_text(aes(label = active_cases))
+```
+
+
+```{r}
+## install.packages("devtools")
+library(devtools)
+## devtools::install_github("li-wen-li/uszipcodes")
+library(uszipcodes)
+beers <- read_csv("data/breweries.csv") 
+raw_zip <- uszipcodes::get_zip(beers$address)
+beers$Zip <- as.integer(uszipcodes::clean_zip(raw_zip))
+
+## only keep zip, lat, and long
+zip_tab <- zip_table %>% dplyr::select(Zip, Latitude, Longitude)
+beer_location <- inner_join(beers, zip_tab)
+content <- beer_location %>%
+  mutate(popup = paste0('<a href =', beer_location$website, '>',
+                        beer_location$brewery_name, '</a>'))
+library(leaflet)
+
+beer_map <- leaflet(beer_location) %>%
+  setView(lng = -98.583, lat = 39.833, zoom = 4) %>% 
+  addTiles() %>% 
+  addProviderTiles(providers$Wikimedia) %>% 
+  addMarkers(lng = beer_location$Longitude, lat = beer_location$Latitude,
+             clusterOptions = markerClusterOptions(),
+             popup = content$popup)
+```
+Exercise 1. Why is inner_join() the most appropriate join function to use here in this example? What observations will an inner_join() get rid of from beers? from zip_tab?
+We will only be visualizing places where there is beer, and beers from which we can visualize the place.
+
+Exercise 2. Examine this link> to look at various “provider” tiles. Choose one to change from Wikimedia and explain how the resulting map looks different.
+
+Supplementary Mapping exercises
+Exericse 1. Make a map of a variable of your choosing. In coord_map(), use projection = "mercator", which is also the default (we will see in a later exercise that this probably is not the best choice).
+```{r}
+world_df <- ggplot2::map_data("world")
+ggplot(data = world_df,
+            mapping = aes(x = long, y = lat,
+                          group = group)) +
+  geom_polygon(colour = "black", fill = "white") +
+  coord_map(projection = "mercator") +
+  theme_void() + coord_map(xlim=c(-180,180))
+```
+
+
+Hint: in ggplot2’s map_data() function, there is a built in map of the "world".
+
+Hint: You can read more about projections in Section 17.3.2 of Modern Data Science with R
+
+Exercise 2. You may notice that the United States does not get coloured in your map. Examine this issue further and fix the map so that the United States is coloured.
+
+Exercise 3. You may have noticed that there are two horizontal stripes across your map. This is an issue that drove me nuts! Check out this submitted issue on ggplot2’s GitHub page for the reason for the error as well as a fix. Use it to fix your plot.
+
+Exercise 4. Read about Mercator projections in this blog post. What does this source say about the sizes of Greenland vs. Africa in a Mercator projection.
+Greenland is 550% too big, it should fit into Africa 14 times
+
+Exercise 5. Examine all of the different options for map projection with ?mapproject. Then, change the projection to "globular". Change the projection again to "gilbert". How does the relative size of Greenland to Africa change in the projections?
+```{r}
+ggplot(data = world_df,
+            mapping = aes(x = long, y = lat,
+                          group = group)) +
+  geom_polygon(colour = "black", fill = "white") +
+  coord_map(projection = "globular") +
+  theme_void() 
+
+ggplot(data = world_df,
+            mapping = aes(x = long, y = lat,
+                          group = group)) +
+  geom_polygon(colour = "black", fill = "white") +
+  coord_map(projection = "gilbert") +
+  theme_void() 
+```
+
