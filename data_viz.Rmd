@@ -356,13 +356,16 @@ You go to your GitHub site and make a change to the README file (adding a senten
 In R Studio, you update one of your .Rmd files, adding a line of code and commit the file.
 You attempt to push the new file to your GitHub site.
 Once you get to the third step, you’ll get an error when you try to push. Why? What do you need to do first before you make the push in Step 3?
-
+The changes made on github site did not align with offline, so first you must pull and then you can commit and push.
 
 Question 2 (6 points). Give 2 advantages of using Git and GitHub. These must be advantages that we discussed in class (so you should not simply google “advantages of Git” and give the first two things that pop up).
+First you have version control, so you have a history of your work to refer to. Second, it makes it easier to share code.
 
 Question 3 (6 points). Choose 1 of the 12 principles of the ethical practice of data science that you think is the most difficult to execute. Give a short, possibly hypothetical, example that illustrates how that principle could be difficult to follow.
+Recognize and mitigate bias in ourselves and in the data we use. This can be difficult since human nature is to find patterns, so for me in my mh research I often find I am searching for my hypothesis subconciously.
 
 Question 4 (6 points). The authors of Data Feminism argued that data scientists should “embrace emotion,” not ignore it when building visuals. State the example that the authors used to show how emotion can be used to make a visual stronger. Then, give an argument against “embracing emotion.” In other words, give an argument that data visualizations should be devoid of emotion as much as possible, even if that’s not what you believe.
+The map of lynchings across America. The argument against emotion would be that emotion creates bias rather than an unbiased portrayal of numbers and fact.
 
 Question 5 (2 points). These two points are given for committing your .Rmd and .html files with a commit message correctly, and pushing them to your GitHub site.
 
@@ -528,11 +531,15 @@ Exercise 2. Examine this link> to look at various “provider” tiles. Choose o
 Supplementary Mapping exercises
 Exericse 1. Make a map of a variable of your choosing. In coord_map(), use projection = "mercator", which is also the default (we will see in a later exercise that this probably is not the best choice).
 ```{r}
+hpi_df <- read_csv("data/hpi-tidy.csv")
 world_df <- ggplot2::map_data("world")
-ggplot(data = world_df,
+table(world_df$region)
+
+joined <- left_join(hpi_df, world_df, by = c("Country" = "region"))
+ggplot(data = joined,
             mapping = aes(x = long, y = lat,
                           group = group)) +
-  geom_polygon(colour = "black", fill = "white") +
+  geom_polygon(colour = "black", aes(fill = Wellbeing)) +
   coord_map(projection = "mercator") +
   theme_void() + coord_map(xlim=c(-180,180))
 ```
@@ -543,6 +550,16 @@ Hint: in ggplot2’s map_data() function, there is a built in map of the "world"
 Hint: You can read more about projections in Section 17.3.2 of Modern Data Science with R
 
 Exercise 2. You may notice that the United States does not get coloured in your map. Examine this issue further and fix the map so that the United States is coloured.
+```{r}
+world_df <- ggplot2::map_data("world")
+ggplot(data = world_df,
+            mapping = aes(x = long, y = lat,
+                          group = group)) +
+  geom_polygon(colour = "black", aes(fill = "white")) +
+  coord_map(projection = "mercator") +
+  theme_void() + coord_map(xlim=c(-180,180))
+```
+
 
 Exercise 3. You may have noticed that there are two horizontal stripes across your map. This is an issue that drove me nuts! Check out this submitted issue on ggplot2’s GitHub page for the reason for the error as well as a fix. Use it to fix your plot.
 
@@ -566,3 +583,237 @@ ggplot(data = world_df,
   theme_void() 
 ```
 
+------------------------
+
+QUIZ 4 TAKE HOME
+
+Use the leaflet package and the us.cities data set from the maps package to make a Zoom-able map of the 50 U.S. capital cities. When you click on a marker for a capital city, both the city name and state as well as the pop (population) should be displayed.
+
+Note that, in the us.cities data set, state capitals are given a value of 2 in the capital variable.
+
+A second note is that if you cannot figure out how to get two “things” (in this case name and population) to display in Leaflet, you would just lose a single point for the quiz (so don’t spend too much time on that part unless you are inclined to do so).
+
+```{r}
+library(leaflet)
+
+capitals <- us.cities %>% filter(capital == 2) %>%
+  mutate(popup = paste("Name: ", capitals$name))
+
+leaflet(capitals) %>%
+  setView(lng = -98.583, lat = 39.833, zoom = 4) %>% 
+  addTiles() %>%
+  addMarkers(lng = capitals$long, lat = capitals$lat,
+             popup = paste("Name: ", capitals$name, 
+                           "<br>", "Population: ", capitals$pop))
+```
+
+-------------------------
+
+7 Expressing Uncertainty and Variability
+
+```{r}
+library(tidyverse)
+pokemon_df <- read_csv("data/pokemon_full.csv")
+pokemon_height <- pokemon_df %>% 
+  filter(Type %in% c("Bug", "Electric", "Fighting", "Flying",
+                     "Grass", "Steel")) %>%
+  group_by(Type) %>%
+  summarise(avg_height = mean(height)) %>%
+  mutate(Type = fct_reorder(Type, avg_height))
+ggplot(data = pokemon_height, aes(x = Type, y = avg_height)) +
+  geom_col() +
+  coord_flip()
+```
+Exercise 1. What can’t we see from this graphic that would be useful?
+We cannot see the variability within each type.
+
+Exercise 2. Make a different plot that shows more relevant features about the underlying data.
+```{r}
+pokemon_new <- pokemon_df %>% 
+  filter(Type %in% c("Bug", "Electric", "Fighting", "Flying",
+                     "Grass", "Steel"))
+ggplot(data = pokemon_new, aes(x = Type, y = height)) +
+  geom_boxplot() +
+  coord_flip()
+```
+
+Exercise 3. Though we are arguing that bar plots are not generally good to show summaries of continuous data, when might we want to make a bar plot of a summary of continuous data anyway?
+When we are not taking an average but comparing counts?
+
+```{r}
+## install.packages("openintro")
+library(openintro)
+data(mlb_players_18)
+mlb_sum <- mlb_players_18 %>% group_by(position) %>%
+  summarise(med_hr = median(HR)) %>%
+  mutate(position = fct_reorder(position, med_hr))
+ggplot(data = mlb_sum, aes(x = position, y = med_hr)) +
+  geom_col() +
+  coord_flip()
+```
+Exercise 4. “Fix” the previous plot to show the underlying variability in the number of homeruns for each player position by making a set of boxplots.
+```{r}
+mlb_players_18 <- mlb_players_18 %>% group_by(position) %>%
+  mutate(sample_size = n())
+plot <- ggplot(data = mlb_players_18, aes(x = position, y = HR, label = sample_size)) +
+  geom_boxplot() +
+  coord_flip()
+```
+
+Exercise 5. Use the plotly package to give the sample size for each group when a user hovers over the boxes.
+```{r}
+library(plotly)
+ggplotly(plot, tooltip = "label")
+```
+Example 1.
+
+Consider a news channel covering a developing hurricane. Which of these types of graphs would better help the general public with the potential variability of the hurricane’s path?
+
+Option 1
+
+OR
+
+Option 2 -- because it shows the possible range
+
+Example 2.
+
+Next, consider fivethirtyeight.com’s coverage of the 2020 presidential election. Much of their forecast given on this page can be simply summarised by saying they predict Biden to win the election with 89% probability. So, why make the supplementary graphics that say the same thing but use a lot more space?
+Shows all the possible outcomes?
+
+Example 3.
+
+Next, consider a data set on National Football League teams, called standings.csv This data set contains the number of wins and losses for each team in very season from 2000 through 2019. In STAT/DATA 234, we made a graph that showed each team’s overall win percentage during this time period.
+Modify the chart so that it shows the variability in each team’s win percentage from season to season.
+
+```{r}
+nfl_df <- read_csv("data/standings.csv")
+nfl_sum <- nfl_df %>% group_by(team, year) %>%
+  summarise(nwins = sum(wins),
+            nlosses = sum(loss)) %>%
+  mutate(ngames = nwins + nlosses,
+         win_percentage = 100 * nwins / ngames) %>%
+  mutate(team = fct_reorder(team, win_percentage))
+ggplot(data = nfl_sum, aes(x = team, y = win_percentage)) +
+  geom_boxplot() +
+  geom_segment(aes(x = team, xend = team, y = 0, yend = win_percentage)) +
+  coord_flip() +
+  labs(y = "Win Percentage")
+```
+
+Example 4.
+
+When we fit a linear regression model to a sample of data, we know that there is sampling variability. 
+
+```{r}
+set.seed(231491)
+n <- 50
+beta0 <- 4
+beta1 <- -2
+x <- 1:n
+epsilon <- rnorm(n, 0, 75)
+y <- beta0 + beta1 * x + epsilon
+df <- tibble(x = x, y = y)
+ggplot(data = df, aes(x = x, y = y)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+sim_reg <- function(n = 50, beta0 = 4, beta1 = -2, s_eps = 75) {
+  x = 1:n
+  epsilon <- rnorm(n, 0, 75)
+
+  y <- beta0 + beta1 * x + epsilon
+  df <- tibble(x = x, y = y)
+  
+  mod <- lm(y ~ x, data = df) 
+  coefs <- mod$coefficients
+  return(coefs)
+}
+sim_reg()
+
+
+output <- purrr::rerun(1000, sim_reg())
+reg_df <- bind_rows(output) %>% rename(intercept = `(Intercept)`, slope = x)
+true_df <- tibble(intercept = 4, slope = -2)
+
+ggplot(data = reg_df) +
+  geom_abline(aes(intercept = intercept, slope = slope), alpha = 0.05) +
+  xlim(c(0, n + 1)) +
+  ylim(c(4 - 2 * 75 - 50, 4 - 2 * 0 + 50)) +
+  geom_abline(data = true_df, aes(intercept = intercept, slope = slope),
+              colour = "red") +
+  labs(x = "x",
+       y = "response")
+statsurvey_df <- read_csv("data/stat113_survey.csv")
+```
+First, is there evidence from the STAT 113 survey that tattoos have become more or less common (at least among SLU students). Second, is there evidence of grade inflation at SLU? That is, is there evidence that student GPAs have increased over time?
+```{r}
+tatoos <- statsurvey_df %>% 
+  select(Tattoo, Year) %>%
+  mutate(Year = as.factor(Year)) %>%
+  filter(!is.na(Tattoo), !is.na(Year)) %>%
+  group_by(Year) %>%
+  mutate(stu_tot = n()) %>%
+  ungroup() %>%
+  filter(Tattoo == "Yes") %>%
+  group_by(Year) %>%
+  mutate(tat_tot = n()) %>%
+  ungroup() %>%
+  summarize(Year = Year, tat_perc = tat_tot/stu_tot)
+ggplot(data = tatoos, aes(x = Year, y = tat_perc)) +
+  geom_col()
+
+gpa <- statsurvey_df %>% 
+  select(GPA, Year) %>%
+  filter(!is.na(Year), !is.na(GPA)) %>%
+   mutate(Year = as.factor(Year))
+ggplot(data = gpa, aes(x = Year, y = GPA)) +
+  geom_boxplot()
+
+gpa_rmv_outlier <- statsurvey_df %>% 
+  select(GPA, Year) %>%
+  filter(!is.na(Year), !is.na(GPA), GPA <= 4) %>%
+   mutate(Year = as.factor(Year))
+ggplot(data = gpa_rmv_outlier, aes(x = Year, y = GPA)) +
+  geom_boxplot()
+```
+
+------------------------
+
+QUIZ 4 IN CLASS
+
+Question 1 (20 points). Examine the alcohol.csv data set that you may have used as an introductory data set in STAT/DATA 234:
+
+```{r}
+library(tidyverse)
+library(here)
+alcohol_df <- read_csv(here("data/alcohol.csv"))
+```
+
+The data set has the following variables on countries throughout the world:
+
+country, the name of the country
+beer_servings, the number of beer servings per person per year
+spirit_servings, the number of spirit servings per person per year
+wine_servings, the number of wine servings per person per year
+total_litres_of_pure_alcohol, the number of litres of pure alcohol consumed per person per year
+Construct a map of the beer_servings variable. You should choose an appropriate projection and change the default colour scheme of your map.
+```{r}
+world_df <- ggplot2::map_data("world")
+world_beer <- left_join(alcohol_df, world_df, by = c("country" = "region"))
+
+ggplot(data = world_beer, aes(x = long, y = lat, group = group)) +
+  geom_polygon(colour = "black", aes(fill = beer_servings)) +
+  coord_map(projection = "mercator", xlim=c(-180,180)) +
+  theme_void() +
+  scale_fill_viridis_c()
+
+ggplot(data = world_df,
+            mapping = aes(x = long, y = lat,
+                          group = group)) +
+  geom_polygon(colour = "black", fill = "white") +
+  coord_map(projection = "mercator") +
+  theme_void() + coord_map(xlim=c(-180,180))
+```
+
+
+Question 2 (5 points). Give an example of a question of interest about the alcohol data where you would want to construct a visualization other than a map to answer the question. What type of visualization would you construct instead?
+A visualization in which you are comparing the three types of consumption per country. I would do a faceted lollipop graph.
