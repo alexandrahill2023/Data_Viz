@@ -817,3 +817,517 @@ ggplot(data = world_df,
 
 Question 2 (5 points). Give an example of a question of interest about the alcohol data where you would want to construct a visualization other than a map to answer the question. What type of visualization would you construct instead?
 A visualization in which you are comparing the three types of consumption per country. I would do a faceted lollipop graph.
+
+---------------------------------------------------
+
+9 Introduction to Shiny
+
+Non shiny starting point
+```{r}
+library(tidyverse)
+library(readxl)
+df <- read_excel("data/slu_graduates_17_21.xlsx")
+
+## fixes error in the data
+df <- df %>% mutate(across(everything(),
+                           .fns = ~replace(., . ==  "STATS" , "STAT")))
+
+df_long <- df %>% pivot_longer(3:8, names_to = "type", values_to = "discipline")
+df_major <- df_long %>% 
+  filter(type == "major1" | type == "major2" | type == "major3")
+
+df_stat <- df_major %>% filter(discipline == "STAT") 
+df_statfull <- semi_join(df_long, df_stat, by = "adm_id") %>%
+  filter(type == "major1" |
+           type == "major2" | 
+           type == "major3")
+
+df_nostat <- df_statfull %>% filter(discipline != "STAT" &
+                              !is.na(discipline)) %>%
+  group_by(discipline) %>%
+  summarise(nstudent = n()) %>%
+  mutate(discipline = fct_reorder(discipline, nstudent))
+ggplot(data = df_nostat, aes(x = discipline, y = nstudent)) +
+  geom_col() +
+  coord_flip()
+```
+
+Shiny
+```{r}
+## install.packages("shiny")
+library(shiny)
+```
+
+```{r}
+#typed shinyapp and clicked the snippet to create this
+library(shiny)
+
+ui <- fluidPage(
+  
+)
+
+server <- function(input, output, session) {
+  
+}
+
+shinyApp(ui, server)
+```
+
+```{r}
+library(shiny)
+ui <- fluidPage(
+  selectInput("dataset", label = "Dataset", choices = ls("package:datasets")),
+  verbatimTextOutput("summary"),
+  tableOutput("table")
+)
+server <- function(input, output, session) {
+  output$summary <- renderPrint({
+    dataset <- get(input$dataset, "package:datasets")
+    summary(dataset)
+  })
+  
+  output$table <- renderTable({
+    dataset <- get(input$dataset, "package:datasets")
+    dataset
+  })
+}
+shinyApp(ui, server)
+```
+
+Reactive expressions 
+```{r}
+ui <- fluidPage(
+  selectInput("dataset", label = "Dataset", choices = ls("package:datasets")),
+  verbatimTextOutput("summary"),
+  tableOutput("table")
+)
+server <- function(input, output, session) {
+  # Create a reactive expression
+  dataset <- reactive({
+    get(input$dataset, "package:datasets")
+  })
+
+  output$summary <- renderPrint({
+    # Use a reactive expression by calling it like a function
+    summary(dataset())
+  })
+  
+  output$table <- renderTable({
+    dataset()
+  })
+}
+shinyApp(ui, server)
+```
+
+9.3 The SLU Majors App
+
+Step 1: Build a static version of the app you want to create. Typically, to do this, you’ll have to choose particular values for what you want the user of the app to eventually be able to change. We have already completed this step by making the graph for STAT majors.
+
+
+Step 2: Decide on and set up an input for the User Interface, UI. We will do this as a class.
+```{r}
+df_nomiss <- df_major %>% filter(!is.na(discipline)) %>%
+  mutate(discipline = factor(discipline))
+majors <- levels(df_nomiss$discipline)
+
+ui <- fluidPage(
+  sidebarLayout(
+    sidebarPanel(selectInput("majorchoice", label = "Choose a Major",
+                             choices = majors)),
+    mainPanel()
+  )
+)
+
+server <- function(input, output, session) {
+  
+}
+
+shinyApp(ui, server)
+```
+
+
+Step 3: Put the static graph (or table) in the server function.
+```{r}
+ui <- fluidPage(
+  sidebarLayout(
+    sidebarPanel(selectInput("majorchoice", label = "Choose a Major",
+                             choices = majors)),
+    mainPanel(plotOutput("m_plot"))
+  )
+)
+
+server <- function(input, output, session) {
+  
+  df_stat <- df_major %>% filter(discipline == "STAT") 
+  df_statfull <- semi_join(df_long, df_stat, by = "adm_id") %>%
+    filter(type == "major1" |
+             type == "major2" | 
+             type == "major3")
+  
+  df_nostat <- df_statfull %>% filter(discipline != "STAT" &
+                                        !is.na(discipline)) %>%
+    group_by(discipline) %>%
+    summarise(nstudent = n()) %>%
+    mutate(discipline = fct_reorder(discipline, nstudent))
+  
+  
+  major_plot <- ggplot(data = df_nostat, aes(x = discipline, y = nstudent)) +
+    geom_col() +
+    coord_flip()
+  
+  output$m_plot <- renderPlot({
+    major_plot
+  })
+}
+
+shinyApp(ui, server)
+```
+
+
+Step 4: Connect the UI selection input to the server, possibly creating a reactive value. Anything that is reactive must go inside a reactive({}) expression, or a render_({}) expression.
+```{r}
+## step 4: connect UI selection to server, creating a reactive value
+## anything that is reactive must go inside a reactive({}) expression
+
+df_nomiss <- df_major %>% filter(!is.na(discipline)) %>%
+  mutate(discipline = factor(discipline))
+majors <- levels(df_nomiss$discipline)
+
+ui <- fluidPage(
+  sidebarLayout(
+    sidebarPanel(selectInput("majorchoice", label = "Choose a Major",
+                             choices = majors)),
+    mainPanel(plotOutput("m_plot"))
+  )
+)
+
+server <- function(input, output, session) {
+  
+  
+  major_reactive_df <- reactive({
+    
+    df_stat <- df_major %>% filter(discipline == input$majorchoice) 
+  df_statfull <- semi_join(df_long, df_stat, by = "adm_id") %>%
+    filter(type == "major1" |
+             type == "major2" | 
+             type == "major3")
+  
+  df_nostat <- df_statfull %>% filter(discipline != input$majorchoice &
+                                        !is.na(discipline)) %>%
+    group_by(discipline) %>%
+    summarise(nstudent = n()) %>%
+    mutate(discipline = fct_reorder(discipline, nstudent))
+  })
+  
+  
+  
+  major_plot <- reactive({
+    ggplot(data = major_reactive_df(), aes(x = discipline, y = nstudent)) +
+    geom_col() +
+    coord_flip()
+  })
+  
+  output$m_plot <- renderPlot({
+    major_plot()
+  })
+}
+
+shinyApp(ui, server)
+```
+
+9.4 Tennis App
+```{r}
+atp_df <- read_csv("data/atp_matches_2019.csv")
+wta_df <- read_csv("data/wta_matches_2019.csv")
+both_df <- bind_rows(atp_df, wta_df)
+
+both_long <- both_df %>% pivot_longer(c(winner_name, loser_name))
+
+## only keep players who have player over 50 matches
+both_n50 <- both_long %>% group_by(value) %>% count() %>%
+  filter(n > 50)
+
+## construct various statistics
+major_tennis <- semi_join(both_long, both_n50, by = c("value"))
+major_tennis <- major_tennis %>% mutate(w_svperc = 100 * w_1stIn / w_svpt,
+                        l_svperc = 100 * l_1stIn / l_svpt,
+                        w_firstwon = 100 * w_1stWon / w_1stIn,
+                        l_firstwon = 100 * l_1stWon / l_1stIn,
+                        w_secondwon = 100 * w_2ndWon / (w_svpt - w_1stIn),
+                        l_secondwon = 100 * l_2ndWon / (l_svpt - l_1stIn))
+major_tennis_w <- major_tennis %>% filter(name == "winner_name")
+major_tennis_l <- major_tennis %>% filter(name == "loser_name")
+
+w_small <- major_tennis_w %>% select(value, winner_seed, w_ace, w_df, w_svperc,
+                                     w_firstwon, w_secondwon) %>%
+  rename(seed = winner_seed, ace = w_ace, df = w_df, svperc = w_svperc,
+         firstwon = w_firstwon, secondwon = w_secondwon)
+
+l_small <- major_tennis_l %>% select(value, loser_seed, l_ace, l_df, l_svperc, l_firstwon, l_secondwon)  %>%
+  rename(seed = loser_seed, ace = l_ace, df = l_df, svperc = l_svperc,
+         firstwon = l_firstwon, secondwon = l_secondwon)
+
+df <- bind_rows(w_small, l_small) %>%
+  rename(player = "value")
+df
+```
+
+Step 1: Make a histogram of one variable for one specific player.
+```{r}
+df_sub <- df %>% filter(player == "Daniil Medvedev")
+ggplot(df_sub, aes(x = ace)) +
+  geom_histogram(colour = "black", fill = "white", bins = 15)
+```
+
+
+Step 2: Set up our shiny app inputs. Before, we just had a single input. Now, we will have two: one for player and one for variable. Let’s focus on one at a time, doing player first. Type shinyapp and click on the R Studio snippet to bring up a base app.
+```{r}
+ui <- fluidPage(
+  sidebarLayout(sidebarPanel(
+    selectizeInput("playerchoice",
+    label = "Choose a Player", choices = levels(factor(df$player)),
+    selected = "Aryna Sabalenka")),
+                mainPanel()
+                )
+)
+
+server <- function(input, output, session) {
+  
+}
+
+shinyApp(ui, server)
+```
+
+
+Step 3: Now that we have one of our inputs in the UI, let’s work on the server. First, we will ignore the input$ selector and put in our graph of aces for Medvedev. We again use the plotOutput(), renderPlot({}) combination.
+```{r}
+ui <- fluidPage(
+  sidebarLayout(sidebarPanel(
+    selectizeInput("playerchoice",
+    label = "Choose a Player", choices = levels(factor(df$player)),
+    selected = "Aryna Sabalenka")),
+                mainPanel(plotOutput("histgraph"))
+                )
+)
+
+server <- function(input, output, session) {
+  df_sub <- df %>% filter(player == "Daniil Medvedev")
+  hist_plot <- ggplot(df_sub, aes(x = ace)) +
+    geom_histogram(colour = "black", fill = "white", bins = 15)
+  
+  output$histgraph <- renderPlot({ #what is histgraph??
+    hist_plot
+  })
+} 
+
+shinyApp(ui, server)
+```
+
+
+Step 4: Now we want to connect the input defined in the UI to the server so that the graph changes depending on which player we select.
+```{r}
+ui <- fluidPage(
+  sidebarLayout(sidebarPanel(
+    selectizeInput("playerchoice",
+    label = "Choose a Player", choices = levels(factor(df$player)),
+    selected = "Aryna Sabalenka")),
+                mainPanel(plotOutput("histgraph"))
+                )
+)
+
+server <- function(input, output, session) {
+  
+  df_sub <- reactive({
+    df %>% filter(player == input$playerchoice)
+  })
+  
+  hist_plot <- reactive({
+    ggplot(df_sub(), aes(x = ace)) +
+    geom_histogram(colour = "black", fill = "white", bins = 15)
+  })
+  
+  output$histgraph <- renderPlot({
+    hist_plot()
+  })
+}
+
+shinyApp(ui, server)
+```
+
+
+Step 5: Now we repeat some of these steps for a second input: a variable that the user selects. We will use radioButtons() as the input in the UI.
+```{r}
+## step 5
+var_choices <- names(df)[3:7]
+
+library(shiny)
+
+ui <- fluidPage(
+  sidebarLayout(sidebarPanel(
+    selectizeInput("playerchoice",
+                   label = "Choose a Player", choices = levels(factor(df$player)),
+                   selected = "Aryna Sabalenka"),
+    radioButtons("varchoice", label = "Choose a Statistic",
+                 choices = var_choices)),
+    mainPanel(plotOutput("histgraph"))
+  )
+)
+
+server <- function(input, output, session) {
+  
+  df_sub <- reactive({
+    df %>% filter(player == input$playerchoice)
+  })
+  
+  
+  hist_plot <- reactive({
+    # ggplot(df_sub(), aes_string(x = input$varchoice)) +
+    # geom_histogram(colour = "black", fill = "white", bins = 15)
+    ggplot(df_sub(), aes(x = .data[[input$varchoice]])) +
+      geom_histogram(colour = "black", fill = "white", bins = 15)
+  })
+  
+  output$histgraph <- renderPlot({
+    hist_plot()
+  })
+}
+
+shinyApp(ui, server)
+```
+
+
+We will discuss why we need to take some extra steps to perform the “user can select a variable” operation in class. In particular, we will need to briefly discuss tidy evaluation to use some of the tidyverse functions in shiny.
+
+Step 6: Finally, we will add a third input that will let the user change the number of bins in the histogram.
+```{r}
+## step 6
+var_choices <- names(df)[3:7]
+
+library(shiny)
+
+ui <- fluidPage(
+  sidebarLayout(sidebarPanel(
+    selectizeInput("playerchoice",
+                   label = "Choose a Player", choices = levels(factor(df$player)),
+                   selected = "Aryna Sabalenka"),
+    radioButtons("varchoice", label = "Choose a Statistic",
+                 choices = var_choices),
+    sliderInput("binnumber", label = "Choose a Number of Bins", 
+                min = 1, max = 50, value = 15, step = 1)),
+    mainPanel(plotOutput("histgraph"))
+  )
+)
+
+server <- function(input, output, session) {
+  
+  df_sub <- reactive({
+    df %>% filter(player == input$playerchoice)
+  })
+  
+  hist_plot <- reactive({
+    # ggplot(df_sub(), aes_string(x = input$varchoice)) +
+    # geom_histogram(colour = "black", fill = "white", bins = 15)
+    ggplot(df_sub(), aes(x = .data[[input$varchoice]])) +
+      geom_histogram(colour = "black", fill = "white", bins = input$binnumber) +
+      theme_grey(base_size = 22)
+  })
+  
+  output$histgraph <- renderPlot({
+    hist_plot()
+  })
+  
+
+}
+
+shinyApp(ui, server)
+```
+
+9.6 Additional Reading and Exercises
+Read the UI Chapter of Mastering Shiny
+
+Exercise 1. In the tennis app, change the histogram input from a sliderInput() to a numericInput().
+
+Exercise 2. In the tennis app, change the histogram input back to sliderinput(). Then, apply 2.2.8 Exercise 3 in Mastering Shiny to the tennis app slider.
+
+Exercise 3. In the SLU majors app, change the major input to radioButtons() so that the user can only select mathematics, statistics, or computer science as the major.
+
+Exercise 4. In the SLU majors app, add a table output below the plot that shows the number of Female majors and the number of Male majors for a major that the user selects.
+
+--------------------------------------------------
+
+TAKE HOME QUIZ 5
+
+Use the STAT 113 survey data set to explore the trend in the popularity of Facebook over time. Do this in 2 ways:
+```{r}
+library(tidyverse)
+stat <- read_csv("data/stat113_survey.csv") %>% filter(!is.na(Facebook)) %>% filter(GPA <= 4)
+```
+
+(7 points). Construct a graph that uses the number of Facebook friends each student has.
+```{r}
+ggplot(stat, aes(x = GPA, y = Facebook)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+(7 points). Construct a graph that uses the proportion of students that have Facebook (assuming that 0 friends means that the student does not have a Facebook account and more than 0 friends means that the student does have a Facebook account).
+```{r}
+stat_face <- stat %>% 
+  group_by(Year) %>%
+  mutate(tot = n()) %>% 
+  ungroup() %>%
+  filter(Facebook >0, !is.na(Year)) %>% 
+  group_by(Year) %>%
+  mutate(Face = n()) %>%
+  ungroup() %>%
+  summarize(Year = Year, prop = Face/tot) 
+
+ggplot(stat_face, aes(x = Year, y = prop)) +
+  geom_col()
+```
+
+1 point is provided for committing and pushing to GitHub correctly.
+
+-----------------------------------------------------
+
+QUIZ 5 IN CLASS
+
+Question 1 (7 points). Consider the following two bar plots using the palmerpenguins data set. The first is a plot of the penguin species while the second is a plot of the average bill length for each species.
+The first graph because the second give a singular value for an average without showing the variance in the data.
+
+Question 2 (9 points). Use the Happy Planet Index data set to construct a graph that does not properly show variability in the underlying data. Recall that some variables in this data set are LifeExpectancy, Wellbeing, Footprint, and Region of the world.
+
+```{r}
+library(tidyverse)
+library(here)
+hpi_df <- read_csv(here("data/hpi-tidy.csv"))
+ggplot(hpi_df, aes(x = Region, y = mean(LifeExpectancy))) +
+  geom_col()
+```
+
+Question 3 (7 points). Fix your graph from the previous question so that it does properly show variability in the underlying data.
+```{r}
+library(tidyverse)
+library(here)
+hpi_df <- read_csv(here("data/hpi-tidy.csv"))
+ggplot(hpi_df, aes(x = Region, y = LifeExpectancy)) +
+  geom_boxplot()
+```
+
+The remaining 2 points are given for committing and pushing your .Rmd and .html files correctly to GitHub.
+
+
+-----------------------------------------
+TAKE HOME QUIZ 6
+
+Construct a Shiny app for any data set that we have worked with so far (besides SLU Majors and Tennis) or for any data set you used in STAT/DATA 234. Thirteen points will be given for Shiny apps that:
+
+run,
+have at least 2 different inputs,
+have at least 1 plot output that looks presentable (e.g. appropriate labels, colour scale, and makes sense to construct).
+Then, write a 2 sentence description about the purpose of your app (2 points).
+
+Note that the in class version of the quiz will prompt you to use an app that has a sidebarLayout(). You do not need to use this function on the take-home quiz, but it may be helpful to use it for extra practice.
+
+--------------------------------------------
+
