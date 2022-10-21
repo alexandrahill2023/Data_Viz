@@ -1,0 +1,236 @@
+---
+title: "midterm"
+output: html_document
+date: "2022-10-21"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Midterm
+
+Question 1 (20 points). Examine the following plot that uses the pokemon_full.csv data set. The plot gives the count of each Pokemon type.
+```{r}
+library(tidyverse)
+library(here)
+pokemon_df <- read_csv(here("data/pokemon_full.csv"))
+pokemon_type <- pokemon_df %>% group_by(Type) %>% summarise(type_count = n())
+
+ggplot(data = pokemon_type, aes(x = Type, y = type_count)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Type",
+       y = "Count") +
+  coord_flip()
+```
+
+part a. Which of the 7 grammar of graphics parameters are explicitly specified in the code to make the plot? data, mappings, geom_function, stat, coordinate_function
+
+part b. For these types of plots, we have usually reordered the Type so that the type with the most Pokemon would be first and the type with the least number of pokemon would be last. Use a principle from the Data Visualization Reading to explain why we would want to do this.
+For data visualization, you want the data to be easily interpretable. 
+
+part c. We have also stated that, for bar plots and lollipop plots, 0 should be included in the plot. On the other hand, for point plots and scatterplots, 0 need not be included. Using a principle from the Data Visualization Reading, explain why it is okay to omit 0 from a point plot but not from a bar plot.
+Scaling cannot be used to influence the interpretation of graphs. With a point plot, 0 is not necessary if you are looking at a separate chunk of x values, but 0 is needed for a bar plot to give a reference point.
+
+Question 2 (5 points). These points will be given for properly committing and pushing a .Rmd and a .html file with your exam answers.
+
+Question 3 (5 points). Tell me something you learned about ethics in data visualization.
+You must be aware of the implications of your findings and potential negative impacts.
+
+Question 4 (20 points).
+
+part a. A data set on United States election results was obtained from https://github.com/kjhealy/us_elections_2020_csv. Use the maps package, as well as this data set (posted on Sakai), to construct a map that fills each U.S. State with the percent of voters who voted for the republican candidate, Trump (percent_gop). For this problem,
+
+you do not need to worry about including Alaska or Hawaii. They are important but this is a timed exam!
+you should change the colour scale so that it is appropriate for the problem.
+```{r}
+library(maps)
+library(tidyverse)
+library(here)
+election_df <- read_csv(here("data/2020_county_pres.csv")) %>%
+  group_by(state_name) %>%
+  summarise(total_gop = sum(votes_gop),
+            total_dem = sum(votes_dem)) %>%
+  mutate(percent_gop = 100 * total_gop / (total_gop + total_dem)) %>%
+  mutate(state_name = str_to_lower(state_name))
+
+state_df <- ggplot2::map_data("state")
+
+state_df <- left_join(state_df, election_df, by = c("region" = "state_name"))
+
+ggplot(data = state_df,
+            mapping = aes(x = long, y = lat,
+                          group = group)) +
+  geom_polygon(colour = "black", aes(fill = percent_gop)) +
+  coord_map(projection = "albers", lat0 = 39, lat1 = 45) +
+  theme_void()
+```
+
+part b. Explain why the data frame R needs to construct a map of the United States is much, much longer than 50 rows.
+There needs to be input for every line that is drawn, and each state requires multiple lines to be drawn. 
+
+Question 5 (25 points). Construct a shiny app using the alcohol.csv data set that has a scatterplot of the number of wine servings vs. the number of beer servings. In the app, the user should be able to select a country and have a label for that country appear on the app.
+
+In addition, create an input that lets the user choose a variable (either beer_servings, spirit_servings, and wine_servings) and create an output that is a histogram based on that variable.
+
+```{r}
+library(tidyverse)
+alcohol <- read_csv("data/alcohol.csv")
+vars <- names(alcohol)[2:4]
+library(ggrepel)
+library(shiny)
+
+ui <- fluidPage(
+  selectizeInput("country_choice",
+                                label = "Choose a Country", 
+                                choices = alcohol$country,
+                                selected = "USA"),
+  radioButtons("var_choice", label = "Choose a Variable", choices = vars),
+  plotOutput("plot"),
+  plotOutput("hist")
+)
+
+server <- function(input, output, session) {
+   # Create a reactive expression
+  #chosen input
+   df_choice <- reactive({
+    alcohol %>% filter(country == input$country_choice)
+  })
+   
+   #chosen var
+   df_var <- reactive({
+    alcohol
+  })
+   
+   #plot
+  point_plot <- reactive({
+    ggplot(data = alcohol, 
+           aes(x = wine_servings, y = beer_servings)) +
+    geom_point() +
+  geom_label_repel(data = df_choice(), aes(label = country)) +
+  geom_point(data = df_choice(), size = 3, shape = 1)
+  })
+  
+  #hist plot
+  hist_plot <- reactive({
+    ggplot(data = df_var(), aes(x = .data[[input$var_choice]])) +
+    geom_histogram(colour = "black", fill = "white", bins = 15)
+  })
+
+  # Use a reactive expression by calling it like a function
+  output$plot <- renderPlot({
+    point_plot()
+  })
+  output$hist <- renderPlot({
+    hist_plot()
+  })
+}
+
+shinyApp(ui, server)
+
+
+#test
+ ggplot(data = alcohol, 
+           aes(x = wine_servings, y = beer_servings, label = country)) +
+    geom_point() +
+  geom_label(aes(label = country))
+ 
+ df_var <- alcohol %>% count(beer_servings)
+ 
+ ggplot(data = alcohol, aes(x = wine_servings)) +
+    geom_histogram()
+```
+
+Question 6 (10 points). For the following shiny app, draw a reactive graph. I think the easiest way to do this would be to hand-draw the graph and hand it in on a piece of paper (there is paper at the front of the room). If you can figure out a way to draw it on your computer, you may do that and push that file to GitHub.
+
+ui <- fluidPage(
+  radioButtons("input1"),
+  selectInput("input2"),
+  numericInput("input3"),
+  plotOutput("output1"),
+  tableOutput("output2")
+)
+
+server <- function(input, output, session) {
+  
+  df <- tibble(xvar = c(1, 2, 3), yvar = c("a", "b", "c"))
+  
+  newval <- reactive({
+    input$input1 - input$input2
+  })
+  
+  anotherval <- reactive({
+    log(input$input1)
+  })
+  
+  output$output1 <- renderPlot({
+    plot(newval())
+  })
+  
+  output$output2 <- renderTable({
+    table(df[[input$input3]])
+  })
+}
+
+shinyApp(ui, server)
+
+
+Question 7 (20 points). Consider again the women’s tennis data set, wta_matches_2019.csv, where each row corresponds to a match played on the WTA (Women’s Tennis Association) tour. Important variables to consider for this problem include:
+
+winner_name, the name of the player who won the match
+loser_name, the name of the player who lost the match
+Construct a lollipop chart that shows the 10 WTA tennis players with the highest average number of aces in the 2019 season who have played at least 20 matches.
+
+```{r}
+library(tidyverse)
+library(here)
+wta_df <- read_csv(here("data/wta_matches_2019.csv"))
+wta_long <- wta_df %>% pivot_longer(c(winner_name, loser_name),
+                                    names_to = "won_or_lost",
+                                    values_to = "player") %>%
+  select(won_or_lost, player, everything())
+
+tennis <- wta_long %>%
+  mutate(ace = if_else(won_or_lost == "winner_name",
+                                            true = w_ace,
+                                            false = l_ace))
+  
+
+data_set_with_players_and_mean_aces <- tennis %>% group_by(player) %>%
+  summarise(mean_aces = mean(ace, na.rm = TRUE))
+
+data_set_with_players_with_20_matches_or_more <- tennis %>% count(player) %>% filter(n>=20)
+
+tennis_final <- semi_join(data_set_with_players_and_mean_aces, data_set_with_players_with_20_matches_or_more, by = c("player" = "player")) 
+
+tennis_order <- tennis_final %>% 
+  mutate(order = fct_reorder(.f = player, .x = mean_aces))%>%
+  top_n(10)
+
+
+
+ggplot(data = tennis_order, aes(x = order, y = mean_aces)) +
+  geom_point() + 
+  geom_segment(aes(x = player, xend = player, y = 0, yend = mean_aces)) 
+  )
+```
+
+Question 8 (20 points).
+
+part a. Consider the lollipop plot you made in Question 7. Why is this plot not the best plot to make to look at the top women’s servers in 2019? (There might be a couple of reasons but you should reference one that we have explicitly talked about in class a lot).
+It is hard to read the names as such with the categorical variable on the y axis.
+
+part b. Fix the plot so that it no longer has the issue you described in Question 8a. If you could not make the plot in Question 7, use this much simpler data set to plot the mean of yvar for each group and then fix the issue.
+```{r}
+ggplot(data = tennis_order, aes(x = order, y = mean_aces)) +
+  geom_point() + 
+  geom_segment(aes(x = player, xend = player, y = 0, yend = mean_aces)) +
+  coord_flip() +
+  theme_light() +
+  theme(
+    panel.grid.major.x = element_blank(),
+    panel.border = element_blank(),
+    axis.ticks.x = element_blank()
+  )
+```
+
