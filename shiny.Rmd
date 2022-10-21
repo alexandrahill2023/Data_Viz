@@ -1,0 +1,160 @@
+---
+title: "Shiny"
+output: html_document
+date: "2022-10-21"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+shiny (20 points)
+
+Topics to Cover:
+
+An Introduction to shiny
+
+An Introduction to Reactivity
+
+You should use a data set other than the data set you chose for the take-home quiz 6.
+
+Make Sure to Include:
+
+(4 points) An introductory statement with the goal of the section (in your own words) and a brief description of the data set and variables you will be using.
+
+(16 points) R code chunks interspersed with some text descriptions about the code you have written and with text description about each topic. At the end of this tutorial, the person reading it should be able to construct a shiny app with real data.
+
+-------------------------------
+
+I will introduce Shiny, an R package that allows the creation of interactive web apps. Then, I will delve deeper into reactivity in Shiny, which ------. I will demonstrate Shiny via a gun violence data set which looks at mortality and ownership rates of guns by state and region in America..
+
+-------------------------------
+
+```{r}
+library(tidyverse)
+guns <- read_csv("data/gun_violence_us.csv")
+```
+
+
+To get started with Shiny, type shinyapp in an R chunk and clicking on the shinyapp snippet option that pops up. Doing so should create:
+
+```{r}
+library(shiny)
+
+ui <- fluidPage(
+  
+)
+
+server <- function(input, output, session) {
+  
+}
+
+shinyApp(ui, server)
+```
+
+ui is the user interface we are creating (how the app LOOKS). fluidPage is what is included on our page (the inputs and outputs) and the layout. Some common types of input styles are selectInput(), radioButtons() and sliderInput(). Common outputs are plotOutput() and tableOutput(). 
+
+```{r}
+regions <- unique(guns$region)
+
+library(shiny)
+
+ui <- fluidPage(
+  radioButtons("region_choice", label = "Region", choices = regions),  #the inputID, 1st var, will be set up in the server
+  plotOutput("plot") #plot will be created in server
+)
+
+server <- function(input, output, session) {
+  
+}
+
+shinyApp(ui, server)
+```
+
+server is how the app WORKS. We tell R how the inputs/outputs are related and the recipe for what to do. REACTIVITY allows us to define the function that R executes depending on the chosen input.
+
+```{r}
+regions <- unique(guns$region)
+vars <- names(guns)[2:3]
+
+library(shiny)
+
+ui <- fluidPage(
+  radioButtons("var_choice", label = "Choose a Variable", choices = vars),
+  selectizeInput("region_choice",
+                                label = "Choose a Region", 
+                                choices = regions,
+                                selected = "South"),
+  plotOutput("plot")
+)
+
+server <- function(input, output, session) {
+   # Create a reactive expression
+  #chosen input
+   df_choice <- reactive({
+    guns %>% filter(region == input$region_choice)
+  })
+   #plot
+  bar_plot <- reactive({
+    ggplot(data = df_choice(), aes(x = .data[[input$var_choice]], y = state)) +
+    geom_col()
+  })
+
+  # Use a reactive expression by calling it like a function
+  output$plot <- renderPlot({
+    bar_plot()
+  })
+}
+
+shinyApp(ui, server)
+```
+
+Reactivity can be very helpful in conjunction with if else statements to adjust graphs based on an input without having to be repetitive in the code.
+For our example, lets say the user can choose to color the graph or not:
+```{r}
+regions <- unique(guns$region)
+vars <- names(guns)[2:3]
+
+library(shiny)
+
+ui <- fluidPage(
+  radioButtons("color_choice", label = "Colored graph?", choices = c("NO", "YES")),
+  radioButtons("var_choice", label = "Choose a Variable", choices = vars),
+  selectizeInput("region_choice",
+                                label = "Choose a Region", 
+                                choices = regions,
+                                selected = "South"),
+  plotOutput("plot")
+)
+
+server <- function(input, output, session) {
+   # Create a reactive expression
+  #chosen input
+   df_choice <- reactive({
+    guns %>% filter(region == input$region_choice)
+  })
+   #plot
+  bar_plot <- reactive({
+    ggplot(data = df_choice(), aes(x = .data[[input$var_choice]], y = state)) +
+    geom_col()
+  })
+  #plot colored
+  bar_plot_color <- reactive({
+    ggplot(data = df_choice(), aes(x = .data[[input$var_choice]], y = state, fill = state)) +
+    geom_col()
+  })
+
+  # Use a reactive expression by calling it like a function
+  output$plot <- renderPlot({
+    if(input$color_choice == "NO") {
+       bar_plot()
+    }
+    else{
+     bar_plot_color()
+    }
+  })
+}
+
+shinyApp(ui, server)
+```
+

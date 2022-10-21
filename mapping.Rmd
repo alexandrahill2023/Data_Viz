@@ -1,0 +1,59 @@
+---
+title: "mapping"
+output: html_document
+date: "2022-10-21"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Mapping (15 points)
+
+Topics to Cover:
+
+Either mapping with the maps package OR mapping from a shapefile. Many shapefiles can be found at https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html
+Make sure to include:
+
+(4 points) An introductory statement with the goal of the section (in your own words) and a brief description of the data set and variables you will be using.
+
+(11 points) R code chunks interspersed with some text descriptions about the code you have written and with text description about each topic. If you are using the maps package, you should use a map other than the U.S. States Map or World Map that we used in class.
+
+---------------------------------------
+
+This explores mapping, which visualizes patterns across space. I will use the maps package to visualise France, and then specifically look at data with the regions of france and 2022 population.
+
+Here is a basic map of France
+```{r}
+library(maps)
+library(tidyverse)
+france <- ggplot2::map_data("france")
+map('france', fill = TRUE)
+```
+
+Now I will color by region
+```{r}
+france_regions <- read.csv("data/departements-france.csv")
+library(readxl)
+france_pop <- read_excel("data/fr_pop.xls")
+
+france_final <- left_join(france, france_regions, by = c("region" = "nom_departement"))
+france_final <- left_join(france_final, france_pop, by = c("nom_region" = "region"))
+
+ggplot(data = france_final,
+            mapping = aes(x = long, y = lat,
+                          group = group, fill = nom_region)) +
+  geom_polygon() +
+  theme_void()
+```
+
+Now I will color by population per region using a sequential color scheme.
+```{r}
+ggplot(data = france_final,
+            mapping = aes(x = long, y = lat,
+                          group = group, fill = population2022)) +
+  geom_polygon() +
+  theme_void()
+```
+
+Unfortunately, with the constantly changing borders and region/department names in France, we are left with inconsistent data that shows why France is a hard country to cleanly visualize as compared to when we visualized the us states.

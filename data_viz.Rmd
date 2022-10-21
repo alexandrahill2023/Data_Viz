@@ -1247,11 +1247,240 @@ Read the UI Chapter of Mastering Shiny
 
 Exercise 1. In the tennis app, change the histogram input from a sliderInput() to a numericInput().
 
-Exercise 2. In the tennis app, change the histogram input back to sliderinput(). Then, apply 2.2.8 Exercise 3 in Mastering Shiny to the tennis app slider.
+```{r}
+var_choices <- names(df)[3:7]
+
+library(shiny)
+
+ui <- fluidPage(
+  sidebarLayout(sidebarPanel(
+    selectizeInput("playerchoice",
+                   label = "Choose a Player", choices = levels(factor(df$player)),
+                   selected = "Aryna Sabalenka"),
+    radioButtons("varchoice", label = "Choose a Statistic",
+                 choices = var_choices),
+    numericInput("binnumber", label = "Choose a Number of Bins", 
+                min = 1, max = 50, value = 15, step = 1)),
+    mainPanel(plotOutput("histgraph"))
+  )
+)
+
+server <- function(input, output, session) {
+  
+  df_sub <- reactive({
+    df %>% filter(player == input$playerchoice)
+  })
+  
+  hist_plot <- reactive({
+    # ggplot(df_sub(), aes_string(x = input$varchoice)) +
+    # geom_histogram(colour = "black", fill = "white", bins = 15)
+    ggplot(df_sub(), aes(x = .data[[input$varchoice]])) +
+      geom_histogram(colour = "black", fill = "white", bins = input$binnumber) +
+      theme_grey(base_size = 22)
+  })
+  
+  output$histgraph <- renderPlot({
+    hist_plot()
+  })
+  
+
+}
+
+shinyApp(ui, server)
+```
+
+
+Exercise 2. In the tennis app, change the histogram input back to sliderinput(). Then, apply 2.2.8 Exercise 3 in Mastering Shiny to the tennis app slider. 
+DOES THIS INCLUDE ANIMATION? (add animation to the input widget so when the user presses play the input widget scrolls through the range automatically.)
+```{r}
+var_choices <- names(df)[3:7]
+
+library(shiny)
+
+ui <- fluidPage(
+  sidebarLayout(sidebarPanel(
+    selectizeInput("playerchoice",
+                   label = "Choose a Player", choices = levels(factor(df$player)),
+                   selected = "Aryna Sabalenka"),
+    radioButtons("varchoice", label = "Choose a Statistic",
+                 choices = var_choices),
+    sliderInput("binnumber", label = "Choose a Number of Bins", 
+                min = 0, max = 100, value = 15, step = 5)),
+    mainPanel(plotOutput("histgraph"))
+  )
+)
+
+server <- function(input, output, session) {
+  
+  df_sub <- reactive({
+    df %>% filter(player == input$playerchoice)
+  })
+  
+  hist_plot <- reactive({
+    # ggplot(df_sub(), aes_string(x = input$varchoice)) +
+    # geom_histogram(colour = "black", fill = "white", bins = 15)
+    ggplot(df_sub(), aes(x = .data[[input$varchoice]])) +
+      geom_histogram(colour = "black", fill = "white", bins = input$binnumber) +
+      theme_grey(base_size = 22)
+  })
+  
+  output$histgraph <- renderPlot({
+    hist_plot()
+  })
+  
+
+}
+
+shinyApp(ui, server)
+```
 
 Exercise 3. In the SLU majors app, change the major input to radioButtons() so that the user can only select mathematics, statistics, or computer science as the major.
+```{r}
+df <- read_excel("data/slu_graduates_17_21.xlsx")
+
+## fixes error in the data
+df <- df %>% mutate(across(everything(),
+                           .fns = ~replace(., . ==  "STATS" , "STAT")))
+
+df_long <- df %>% pivot_longer(3:8, names_to = "type", values_to = "discipline")
+df_major <- df_long %>% 
+  filter(type == "major1" | type == "major2" | type == "major3")
+
+df_nomiss <- df_major %>% filter(!is.na(discipline)) %>%
+  mutate(discipline = factor(discipline)) %>% 
+  filter(discipline == "MATH" | 
+           discipline == "STAT" |
+           discipline == "CS")
+
+#why including all the disciplines
+majors <- levels(df_nomiss$discipline) 
+
+ui <- fluidPage(
+  sidebarLayout(
+    sidebarPanel(radioButtons("majorchoice", label = "Choose a Major",
+                             choices = df_nomiss$discipline)),
+    mainPanel(plotOutput("m_plot"))
+  )
+)
+
+server <- function(input, output, session) {
+  
+  
+  major_reactive_df <- reactive({
+    
+    df_choice <- df_nomiss %>% filter(discipline == input$majorchoice) 
+  df_full <- semi_join(df_long, df_choice, by = "adm_id") %>%
+    filter(type == "major1" |
+             type == "major2" | 
+             type == "major3")
+  
+  df_nochoice <- df_full %>% filter(discipline != input$majorchoice &
+                                        !is.na(discipline)) %>%
+    group_by(discipline) %>%
+    summarise(nstudent = n()) %>%
+    mutate(discipline = fct_reorder(discipline, nstudent))
+  })
+  
+  
+  
+  major_plot <- reactive({
+    ggplot(data = major_reactive_df(), aes(x = discipline, y = nstudent)) +
+    geom_col() +
+    coord_flip()
+  })
+  
+  output$m_plot <- renderPlot({
+    major_plot()
+  })
+}
+
+shinyApp(ui, server)
+```
+
 
 Exercise 4. In the SLU majors app, add a table output below the plot that shows the number of Female majors and the number of Male majors for a major that the user selects.
+```{r}
+library(knitr)
+library(readxl)
+df <- read_excel("data/slu_graduates_17_21.xlsx")
+
+## fixes error in the data
+df <- df %>% mutate(across(everything(),
+                           .fns = ~replace(., . ==  "STATS" , "STAT")))
+
+df_long <- df %>% pivot_longer(3:8, names_to = "type", values_to = "discipline")
+df_major <- df_long %>% 
+  filter(type == "major1" | type == "major2" | type == "major3")
+
+df_nomiss <- df_major %>% filter(!is.na(discipline)) %>%
+  mutate(discipline = factor(discipline)) 
+majors <- levels(df_nomiss$discipline) 
+
+ui <- fluidPage(
+  sidebarLayout(
+    sidebarPanel(selectInput("majorchoice", label = "Choose a Major",
+                             choices = majors)),
+    mainPanel(plotOutput("m_plot"), tableOutput("m_table"))
+  )
+)
+
+server <- function(input, output, session) {
+  
+  
+  major_reactive_df <- reactive({
+    
+    df_stat <- df_major %>% filter(discipline == input$majorchoice) 
+  df_statfull <- semi_join(df_long, df_stat, by = "adm_id") %>%
+    filter(type == "major1" |
+             type == "major2" | 
+             type == "major3")
+  
+  df_nostat <- df_statfull %>% filter(discipline != input$majorchoice &
+                                        !is.na(discipline)) %>%
+    group_by(discipline) %>%
+    summarise(nstudent = n()) %>%
+    mutate(discipline = fct_reorder(discipline, nstudent))
+  })
+  
+  
+  
+  major_plot <- reactive({
+    ggplot(data = major_reactive_df(), aes(x = discipline, y = nstudent)) +
+    geom_col() +
+    coord_flip()
+  })
+  
+  output$m_plot <- renderPlot({
+    major_plot()
+  })
+  
+  
+    
+sex_reactive_df <- reactive({
+    
+    df_stat <- df_major %>% filter(discipline == input$majorchoice) 
+  df_statfull <- semi_join(df_long, df_stat, by = "adm_id") %>%
+    filter(type == "major1" |
+             type == "major2" | 
+             type == "major3")
+  
+  df_nostat <- df_statfull %>% filter(discipline != input$majorchoice &
+                                        !is.na(discipline)) %>%
+    group_by(discipline) %>%
+    mutate(nstudent = n()) %>%
+    ungroup() %>%
+    filter(sex == "F") %>%
+    group_by(discipline)
+    summarise(fems = n(), males = nstudent - fems)
+  })
+
+  output$m_table <- renderTable({
+    head(sex_reactive_df()) #WHY THIS TABLE NOT WORK
+  })
+}
+
+shinyApp(ui, server)
+```
 
 --------------------------------------------------
 
@@ -1260,29 +1489,42 @@ TAKE HOME QUIZ 5
 Use the STAT 113 survey data set to explore the trend in the popularity of Facebook over time. Do this in 2 ways:
 ```{r}
 library(tidyverse)
-stat <- read_csv("data/stat113_survey.csv") %>% filter(!is.na(Facebook)) %>% filter(GPA <= 4)
+stat <- read_csv("data/stat113_survey.csv") %>% filter(!is.na(Facebook), !is.na(Year)) %>% filter(GPA <= 4)
 ```
 
-(7 points). Construct a graph that uses the number of Facebook friends each student has.
+(7 points). Construct a graph that uses the number of Facebook friends each student has. CHANGE OVER TIME
 ```{r}
-ggplot(stat, aes(x = GPA, y = Facebook)) +
-  geom_point() +
-  geom_smooth(method = "lm")
+ggplot(stat, aes(x = factor(time_year), y = Facebook)) +
+  geom_boxplot() #fct_inorder() = graphs in order of column in df
+
+fb_mean <- stat %>% group_by(time_both) %>% filter(!is.na(Facebook)) %>%
+  summarise(mean = mean(Facebook, na.rm = TRUE),
+            nstudent = n(),
+            sdfacebook = sd(Facebook, na.rm = TRUE)) %>%
+  mutate(se = sdfacebook / sqrt(nstudent), se_1 = mean - se,
+         se_u = mean + se) %>%
+  mutate(time_both = fct_drop(time_both))
+
+ggplot(stat %>% filter(!is.na(Facebook)),
+       aes(x = time_both, y = Facebook)) +
+  geom_point(alpha = .1) +
+  geom_point(data = fb_mean, aes(x = time_both, y = mean), color = "red") +
+  geom_errorbar(data = fb_mean, aes(y=mean, ymin = se_1, ymax = se_u))
 ```
 
 (7 points). Construct a graph that uses the proportion of students that have Facebook (assuming that 0 friends means that the student does not have a Facebook account and more than 0 friends means that the student does have a Facebook account).
 ```{r}
 stat_face <- stat %>% 
-  group_by(Year) %>%
+  group_by(time_year) %>%
   mutate(tot = n()) %>% 
   ungroup() %>%
-  filter(Facebook >0, !is.na(Year)) %>% 
+  filter(Facebook >0) %>% 
   group_by(Year) %>%
   mutate(Face = n()) %>%
   ungroup() %>%
-  summarize(Year = Year, prop = Face/tot) 
+  summarize(time_year = time_year, prop = Face/tot) 
 
-ggplot(stat_face, aes(x = Year, y = prop)) +
+ggplot(stat_face, aes(x = time_year, y = prop)) +
   geom_col()
 ```
 
@@ -1312,6 +1554,10 @@ library(here)
 hpi_df <- read_csv(here("data/hpi-tidy.csv"))
 ggplot(hpi_df, aes(x = Region, y = LifeExpectancy)) +
   geom_boxplot()
+
+ggplot(hpi_df, aes(x = Footprint)) +
+  geom_freqpoly(aes(color = Region), bins = 10) +
+  scale_colour_viridis_d()
 ```
 
 The remaining 2 points are given for committing and pushing your .Rmd and .html files correctly to GitHub.
@@ -1327,7 +1573,214 @@ have at least 2 different inputs,
 have at least 1 plot output that looks presentable (e.g. appropriate labels, colour scale, and makes sense to construct).
 Then, write a 2 sentence description about the purpose of your app (2 points).
 
+An app to look at the vaarious sports and the relation to age and variables of money making. This includes salary, total pay, and endorsements.
+
 Note that the in class version of the quiz will prompt you to use an app that has a sidebarLayout(). You do not need to use this function on the take-home quiz, but it may be helpful to use it for extra practice.
 
+stagnant graph
+```{r}
+library(tidyverse)
+athlete <- read_csv("data/athletesdata.csv") 
+  
+athlete_test <- athlete %>% filter(Sport == "Baseball")
+
+ggplot(data = athlete_test, 
+       aes(x = age, y = salary)) +
+  geom_point()
+```
+
+
+```{r}
+var_choices <- names(athlete)[5:7]
+
+library(shiny)
+
+ui <- fluidPage(
+  sidebarLayout(
+    sidebarPanel(selectInput("sportchoice", 
+                             label = "Choose a Sport",
+                             choices = levels(factor(athlete$Sport))),
+                 radioButtons("varchoice", label = "Choose a Statistic",
+                 choices = var_choices)),
+    mainPanel(plotOutput("plot"))
+    )
+)
+
+server <- function(input, output, session) {
+  athlete_test <- reactive({
+    athlete %>% filter(Sport == input$sportchoice)
+  })
+  
+  plot_test <- reactive({
+    ggplot(data = athlete_test(), 
+       aes(x = age, y = .data[[input$varchoice]])) +
+  geom_point()
+  })
+    
+  output$plot <- renderPlot({
+    plot_test()
+  })
+}
+
+shinyApp(ui, server)
+```
+
+
 --------------------------------------------
+QUIZ 6 IN CLASS
+
+Question 1 (6 points). Using the SLU Majors data set, give an example of a situation where you would construct a static graph instead of an interactive graph. Why would the static graph be better?
+If we wanted a bar graph with each discipline and the number of students majoring in that discipline -- the shiny app allowing us to choose the sex of the student. Nothing would be changing in terms of the graph, as the input value (majors) and the measurement (num of students) remains constant.
+
+OR if we wanted to show minors associated with a specific major (cuz no gaurantee that a user would select that major)
+
+
+Question 2 (17 points). Consider this version of the Tennis App from class:
+
+Add a plot below the histogram that is a side-by-side boxplot for comparing a serving statistic of two players. The user should be able to select the two players as well as the statistic being compared.
+
+Hint: You’ll need to create both a new input (for the second player) and a new output (for the second graph).
+
+Hint 2: The histogram may now have data from both players. There is no need to fix this so that it only shows one player’s stats.
+
+```{r}
+library(shiny); library(tidyverse)
+atp_df <- read_csv("data/atp_matches_2019.csv")
+wta_df <- read_csv("data/wta_matches_2019.csv")
+both_df <- bind_rows(atp_df, wta_df)
+
+both_long <- both_df %>% pivot_longer(c(winner_name, loser_name))
+
+## only keep players who have player over 50 matches
+both_n50 <- both_long %>% group_by(value) %>% count() %>%
+  filter(n > 50)
+
+## construct various statistics
+major_tennis <- semi_join(both_long, both_n50, by = c("value"))
+major_tennis <- major_tennis %>% mutate(w_svperc = 100 * w_1stIn / w_svpt,
+                        l_svperc = 100 * l_1stIn / l_svpt,
+                        w_firstwon = 100 * w_1stWon / w_1stIn,
+                        l_firstwon = 100 * l_1stWon / l_1stIn,
+                        w_secondwon = 100 * w_2ndWon / (w_svpt - w_1stIn),
+                        l_secondwon = 100 * l_2ndWon / (l_svpt - l_1stIn))
+
+major_tennis_w <- major_tennis %>% filter(name == "winner_name")
+major_tennis_l <- major_tennis %>% filter(name == "loser_name")
+
+w_small <- major_tennis_w %>% select(value, winner_seed, w_ace, w_df, w_svperc,
+                                     w_firstwon, w_secondwon) %>%
+  rename(seed = winner_seed, ace = w_ace, df = w_df, svperc = w_svperc,
+         firstwon = w_firstwon, secondwon = w_secondwon)
+
+l_small <- major_tennis_l %>% select(value, loser_seed, l_ace, l_df, l_svperc, l_firstwon, l_secondwon)  %>%
+  rename(seed = loser_seed, ace = l_ace, df = l_df, svperc = l_svperc,
+         firstwon = l_firstwon, secondwon = l_secondwon)
+
+df <- bind_rows(w_small, l_small) %>%
+  rename(player = "value")
+df
+
+var_choices <- names(df)[3:7]
+
+library(shiny)
+
+ui <- fluidPage(
+  sidebarLayout(
+    sidebarPanel(selectizeInput("playerchoice",
+                                label = "Choose a Player", 
+                                choices = levels(factor(df$player)),
+                                selected = "Aryna Sabalenka"),
+                 selectizeInput("playerchoice2",
+                                label = "Choose a Player", 
+                                choices = levels(factor(df$player)),
+                                selected = "Alex De Minaur"),
+                 radioButtons("varchoice", 
+                              label = "Choose a Statistic",
+                              choices = var_choices),
+                 radioButtons("meanchoice", label = "Display the Mean?", choices = c("YES", "NO"))),
+    mainPanel(plotOutput("histgraph"), plotOutput("sidebyside"))
+  )
+)
+
+server <- function(input, output, session) {
+  
+  df_sub <- reactive({
+    df %>% filter(player == input$playerchoice)
+  })
+  
+  
+  hist_plot <- reactive({
+    # ggplot(df_sub(), aes_string(x = input$varchoice)) +
+    # geom_histogram(colour = "black", fill = "white", bins = 15)
+    ggplot(df_sub(), aes(x = .data[[input$varchoice]])) +
+      geom_histogram(colour = "black", fill = "white", bins = 15)
+  })
+  
+  output$histgraph <- renderPlot({
+    hist_plot()
+  })
+  
+  df_sub2 <- reactive({
+    df %>% filter(player == input$playerchoice | player == input$playerchoice2)
+  })
+  
+  sidebyside_plot <- reactive({
+    # ggplot(df_sub(), aes_string(x = input$varchoice)) +
+    # geom_histogram(colour = "black", fill = "white", bins = 15)
+    ggplot(df_sub2(), aes(x = player, y = svperc)) +
+  geom_boxplot() 
+  })
+  
+  sidebyside_plot_mean <- reactive({
+    # ggplot(df_sub(), aes_string(x = input$varchoice)) +
+    # geom_histogram(colour = "black", fill = "white", bins = 15)
+    ggplot(df_sub2(), aes(x = player, y = svperc)) +
+  geom_boxplot() +
+  stat_summary(fun = mean, geom = "point", colour = "purple", shape = 8,
+               size = 3)
+  })
+  
+  output$sidebyside <- renderPlot({
+    if(input$meanchoice == "NO") {
+    sidebyside_plot()
+    }
+    else {
+      sidebyside_plot_mean()
+    }
+  })
+}
+
+shinyApp(ui, server)
+```
+
+test
+```{r}
+df_sub2 <- df %>% filter(player == "Aryna Sabalenka" | player == "Alex De Minaur")
+
+ggplot(df_sub2, aes(x = player, y = svperc)) +
+  geom_boxplot() +
+  stat_summary(fun = mean, geom = "point", colour = "purple", shape = 8,
+               size = 3)
+```
+
+
+Extra Credit (2 points). Add an input to your app that gives the user a choice for whether or not to display the means on the side-by-side boxplot (you must also modify the server so that the boxplots actually update if the user selects the means to be displayed). Below is code that plots the means on a static side-by-side boxplot.
+
+```{r}
+library(tidyverse)
+toy_df <- tibble(response = rnorm(100, 0, 1),
+                 group = sample(c("A", "B"), size = 100, replace = TRUE))
+ggplot(toy_df, aes(x = group, y = response)) +
+  geom_boxplot() +
+  stat_summary(fun = mean, geom = "point", colour = "purple", shape = 8,
+               size = 3)
+```
+
+
+-----------------------------------------------------
+
+10 Reactivity and Other Topics in shiny
+
+
+----------------------------------------------------
 
