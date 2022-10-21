@@ -1,0 +1,41 @@
+---
+title: "Expressing Uncertainty"
+output: html_document
+date: "2022-10-21"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Expressing Uncertainty (15 points)
+
+Topics to Cover:
+
+Incorporating Data Variability in Graphs
+Make sure to include:
+
+(4 points) An introductory statement with the goal of the section (in your own words) and a brief description of the data set and variables you will be using.
+
+(11 points) R code chunks interspersed with some text descriptions about the code you have written and with text description about each topic. For this section, you should actually make a graph (and not simply find an example already online like we looked at for hurricane graphs).
+
+-----------------------------
+
+This covers how to visualize data with variability so as not to exclude variability from the visual. I will use the gun violence data set, which has mortality and ownership rates of guns by state and region in America. 
+
+-------------------------------
+
+This plot visualizes an average, excluding all variability from the visual:
+```{r}
+library(tidyverse)
+guns <- read_csv("data/gun_violence_us.csv")
+  
+ggplot(data = guns, aes(x = region, y = mean(mortality_rate))) +
+  geom_col()
+```
+
+This plot shows more relevant features about the underlying data -- seeing both the mean and the variability via a boxplot:
+```{r}
+ggplot(data = guns, aes(x = region, y = mortality_rate)) +
+  geom_boxplot()
+```
