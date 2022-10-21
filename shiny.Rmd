@@ -2,6 +2,7 @@
 title: "Shiny"
 output: html_document
 date: "2022-10-21"
+runtime: shiny
 ---
 
 ```{r setup, include=FALSE}

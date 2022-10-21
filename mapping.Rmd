@@ -23,16 +23,11 @@ Make sure to include:
 
 This explores mapping, which visualizes patterns across space. I will use the maps package to visualise France, and then specifically look at data with the regions of france and 2022 population.
 
-Here is a basic map of France
+With a basic map of France, I will color by region
 ```{r}
 library(maps)
 library(tidyverse)
 france <- ggplot2::map_data("france")
-map('france', fill = TRUE)
-```
-
-Now I will color by region
-```{r}
 france_regions <- read.csv("data/departements-france.csv")
 library(readxl)
 france_pop <- read_excel("data/fr_pop.xls")
