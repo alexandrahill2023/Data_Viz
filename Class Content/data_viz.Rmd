@@ -1,0 +1,1786 @@
+---
+title: "dataviz_intro"
+output: html_document
+date: "2022-09-02"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Intro HW:
+
+2 Motivation and Grammar of Graphics
+
+Review Exercises:
+
+Exercise 1. In the above plots, we skipped the final “two variable” combination: one quantitative variable and one categorical variable. Create either a side-by-side boxplot or side-by-side violin plot of a quantitative and a categorical variable in the penguins data set.
+```{r}
+library(palmerpenguins)
+library(tidyverse)
+ggplot(penguins, aes(x = species, y = bill_length_mm)) +
+  geom_boxplot()
+ggplot(penguins, aes(x = species, y = bill_length_mm)) +
+  geom_violin()
+```
+
+Exercise 2. Modify the frequency plot made with geom_freqpoly() to use colour in two different ways:
+change the colour of the line to any colour that R knows. A list of some colours can be found at this link.
+add a colour asethetic to make three different frequency lines, one for each species of penguin.
+Hint: recall that only aesthetic mappings (variables) go inside aes(). Of (a) or (b), which one is an aesthetic mapping?
+```{r}
+ggplot(data = penguins, aes(x = bill_length_mm)) +
+  geom_freqpoly(colour = "red")
+
+ggplot(data = penguins, aes(x = bill_length_mm, color = species)) +
+  geom_freqpoly()
+```
+
+Exercise 3. Thus far, we have only plotted one or two variables at a time. Recall that one way to construct a plot of three different variables is to use colour. Modify the scatterplot so that the points are coloured by species.
+```{r}
+ggplot(data = penguins, aes(x = bill_length_mm, y = bill_depth_mm, color = species)) +
+  geom_point() +
+  geom_smooth()
+```
+
+Exercise 4. Recall that aes() aesthetics specified within the ggplot() function directly are called global aesthetics because every other GEOM will use them (unless specifically overridden) while aes() specified within a particular GEOM are called local aesthetics because only that particular GEOM will use them.
+Modify the scatterplot and smoother so that
+- the points are coloured by species, but there is only one smoother instead of three.
+- there are three different coloured smoothers (one for each species) but the points are all the same colour.
+```{r}
+ggplot(data = penguins, aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point(aes(color = species)) +
+  geom_smooth()
+
+ggplot(data = penguins, aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point() +
+  geom_smooth(aes(color = species))
+```
+
+Exercise. Make a plot of the penguins data that explicitly specifies all 7 parameters in the grammar of graphics, even if you just explicitly specify the default for some of the parameters.
+```{r}
+ggplot(data = penguins, aes(x = island, fill = sex)) + 
+  geom_bar(stat = "count", position = "dodge") +
+  coord_flip() +
+  facet_wrap(~ species)
+```
+
+
+-----------------------------
+
+3.2: Data Visualization Concepts - Part 1
+
+1. Using either Anscombe’s quartet or the income/voter turnout graph as an example, explain why it’s valuable to look at data graphically instead of examining data only with summary statistics.
+Anscombe's quartet shows four data sets in which the numerically calculated means are the same but the visual differences are apparent.
+
+2. Take a look at the bar plot in Figure 1.4. Give a couple of reasons for why the chart has “bad taste.”
+Hard to tell x value. Key repeats y value info.
+
+3. Why might you not always want to maximize the data-to-ink ratio when making charts?
+harder to interpret and less memorable.
+
+4. What do the authors mean when they say that “relative comparisons need a stable baseline” and how does that affect your ability to interpret the coloured stacked bar plot in Figure 1.11?
+In order to compare values, they should start at the same point to be able to easily see the relative heights. So for the stacked bar plot, the bottom row all have the stable baseline of the x axis allowing comparison, but the next rows start at different values so are not as easily compared.
+
+5. What are two key takeaways from Sections 1.1 and 1.2?
+perception influences viz quality. also data intepretability.
+
+6. What is one question that you have about the reading?
+how can i customize my vizs in R to my own aesthetic liking?
+
+--------------
+
+3.3 Data Visualization Concepts: Part 2 
+(quiz 1 take home)
+
+1. hue = color. intensity = vividness
+
+2. Think of an example where you would want to use a sequential colour scale that’s different from the one given in the text. Then, think of examples where you would use a diverging colour scale and an unordered colour scale.
+bright yellow to black for night to day?
+diverging - politics.
+unordered - visualizing categorical, non-ordered variables.
+
+3. Some gestalt inferences take priority over others. Using Figure 1.21, give an example of a gestalt inference that takes priority over another one.
+for the top right colored circles, the similarity inference takes priority over the proximity inference.
+
+4. “Bar charts are better than Pie charts for visualizing a single categorical variable.” Explain how results shown in Figure 1.23 support this claim.
+The log error when estimating the size difference between data points for a single categorical varialbe are in the 1 to 1.75 range, while for a pie chart the log error is on average 2 to 2.4.
+
+
+5. Suppose you have a scatterplot of height on the y-axis vs. weight on the x-axis for people born in Canada, Mexico, and the United States. You now want to explore whether the relationship is different for people born in the United States, people born in Canada, and people born in Mexico. Should you use different shapes to distinguish the three countries or should you use different colours? Explain using either Figure 1.24 or 1.25.
+1.25 shows that color hue is better for differentiation than shape.
+
+
+6. When might you use the left-side of Figure 1.27 to show the law school data? When might you use the right-side of Figure 1.27 to show the law school data?
+The graph on the left is beneficial to point out the drastic drop in enrollment, more to see a comparison -- while the right shows the continued high enrollment rates despite any dropoff.
+
+7. Summary: What are two takeaways from Sections 1.3-1.7?
+Non-zero axis starting points emphssize changee over actual number. 
+bar graphs are the most effective for accurate visual comprehension.
+
+8. What is one question that you have about the reading?
+What is the checks and balance system -- if i publish research with a moral and correct graph that has slight bias of wanting to confirm my own hypothesis, how is that critiqued?
+
+--------------------------------
+
+5 tidyverse Review
+
+5.1.1 Exercises
+Exercise 1. Make the visualization that we sketched in class. We will complete this exercise as a class.
+Exercise 2. There is a minor flaw in the way that we counted up the number of hits for each artist. Examine the 2nd to last row of the original data set with tail() to look at this potential flaw. What do you find?
+Exercise 3. Challenging. Fix the issue in Exercise 2. May want to skip this question and come back after completing the other exercises.
+```{r}
+library(tidyverse)
+library(billboard)
+
+hot_100s <- wiki_hot_100s %>%
+  filter(year >= 2000 & year <= 2009) %>%
+  separate(col = artist, into = c("artist", "featured_artist"), 
+           sep = " featuring ") %>%
+  count(artist) %>%
+  arrange(desc(n)) %>%
+  slice(1:20) %>%
+  mutate(artist = fct_reorder(artist, n))
+  
+ggplot(hot_100s, aes(x = artist, y=n)) +
+  geom_col() +
+  coord_flip()
+
+```
+
+Exercise 4. Change the plot from Exercise 1 to be a Lollipop chart using this website as a reference. Why might the lollipop chart be better than a bar plot?
+Exercise 5. Use this website to customize the end points of your lollipop chart. If you have time, you can explore the other customization options. Make it look fancy!
+```{r}
+ggplot(data = hot_100s, aes(x = artist, y = n)) +
+  geom_point() + 
+  geom_segment(aes(x = artist, xend = artist, y = 0, yend = n)) +
+  coord_flip() +
+  labs(x = "Artist Name", 
+       y = "Number of Songs in Top 100")+
+  theme_light() +
+  theme(
+    panel.grid.major.x = element_blank(),
+    panel.border = element_blank(),
+    axis.ticks.x = element_blank()
+  )
+```
+
+-----------------------------
+
+quiz 1 - in person
+
+1. The trends of group five are easiest to analyze, as they have a stable baseline, the x axis, that allow for easy relative comparison.
+
+2. 
+```{r}
+library(tidyverse)
+category <- rep(c("Group 1", "Group 2", "Group 3", "Group 4", "Group 5"), 7)
+time <- rep(c(2000, 2001, 2002, 2003, 2004, 2005, 2006), each = 5) 
+response <- rpois(length(category), 30)
+df <- tibble(category, time, response)
+ggplot(data = df, aes(x = time, y = response)) +
+  geom_col() +
+  labs(y = "count") +
+  facet_wrap(~category)
+```
+
+3a. Diverging -- a positive change would be one color, a negative change the opposite color, and no change the neutral middle color.
+
+3b. Sequential -- allows light at 0 and increasing darkness with increasung number of cases.
+
+4. <COORDINATE_FUNCTION>
+
+5a. 
+```{r}
+ggplot(data = df, aes(x = time, y = response)) +
+  geom_point(colour = "blue")
+```
+Remove the aes() from around the color assignment, as the aes() assumes you will be assigning color a variable and not a constant color.
+
+5b. 
+```{r}
+ggplot(data = df, aes(x = time, y = response)) +
+  geom_point(aes(colour = category)) +
+  geom_smooth(se = FALSE, span = 1.9)
+```
+move the aes() mapping of colour to the geom_point() mapping, as that will make the categorization only occur for the points while the smooth applies to the data as a whole from the ggplot() mapping. 
+
+
+------------------
+QUIZ 2 TAKEHOME
+
+```{r}
+library(tidyverse)
+library(readxl)
+df <- read_excel("data/slu_graduates_17_21.xlsx")
+
+## fixes error in the data
+df <- df %>% mutate(across(everything(),
+                           .fns = ~replace(., . ==  "STATS" , "STAT")))
+```
+
+Question 1 (7 points). Make the following chart that shows the “other” majors of each STAT major student in the data set. Hint: You will need dplyr and forcats: it may be helpful to use some STAT 234 materials linked here to reference the bar plot made for Pokemon Type.
+```{r}
+df_long <- df |> filter(major1 == "STAT" | major2 == "STAT" | major3 == "STAT") |>
+  pivot_longer(3:8, names_to = "type", values_to = "discipline")
+
+df_major <- df_long %>% 
+  filter(type == "major1" | type == "major2" | type == "major3")
+
+df_major <- df_major |>
+  group_by(discipline) |>
+  summarise(count_type = n()) |>
+  filter(!is.na(discipline) & !discipline == "STAT")|> 
+  mutate(discipline = fct_reorder(.f = discipline, .x = count_type))
+
+ggplot(data = df_major, aes(x = discipline,
+                               y = count_type)) +
+  geom_col() +
+  coord_flip()
+```
+
+Question 2 (8 points). Make the following lollipop graphic, which investigates the sex disparity of majors at SLU with 50 or more total graduates in the past few years. The y-axis is the major while the x-axis is the proportion of majors who identified as Female. Note that the graph shown below eliminates some of the majors because I want you to discover the final trends on your own! Remember that your graphic should only include all of the majors with 50 or more total graduates.
+```{r}
+df_long <- df %>% pivot_longer(3:8, names_to = "type", values_to = "discipline")
+
+df_major <- df_long %>% 
+  filter(type == "major1" | type == "major2" | type == "major3") |>
+  filter(!is.na(discipline)) |>
+  group_by(discipline) |>
+  mutate(students_with_major = n())|>
+  ungroup() |>
+  filter(students_with_major >= 50 & sex == "F")|>
+  group_by(discipline) |>
+  mutate(count_fem = n()) |>
+  ungroup() |>
+  summarise(discipline = discipline, perc = count_fem / students_with_major) |>
+  mutate(discipline = fct_reorder(discipline, perc))
+
+ggplot(data = df_major, aes(x = discipline, y = perc)) +
+  geom_point() + 
+  geom_segment(aes(x = discipline, xend = discipline, y = 0, yend = perc)) +
+  coord_flip() 
+```
+
+
+-----------------------------
+QUIZ 2 INCLASS
+```{r}
+library(tidyverse)
+library(readxl)
+df <- read_excel("data/slu_graduates_17_21.xlsx")
+
+## fixes error in the data
+df <- df %>% mutate(across(everything(),
+                           .fns = ~replace(., . ==  "STATS" , "STAT")))
+
+df_long <- df %>% pivot_longer(3:8, names_to = "type", values_to = "discipline")
+
+df_major <- df_long %>% 
+  filter(type == "major1" | type == "major2" | type == "major3")
+```
+
+Question 1 (10 points). Make a lollipop chart of the counts of the top 10 most popular majors at SLU in the past five years, ordering the “lollies” from the most popular major to the 10th most popular major.
+```{r}
+df_major_quiz <- df_major |>
+  filter(!is.na(discipline)) |>
+  group_by(discipline) |>
+  summarize(students_with_major = n())|>
+  ungroup() %>%
+  arrange(desc(discipline)) %>%
+  slice(1:10) |>
+  mutate(discipline = fct_reorder(discipline, students_with_major))
+
+
+ggplot(data = df_major_quiz, aes(x = discipline, y = students_with_major)) +
+  geom_point() + 
+  geom_segment(aes(x = discipline, xend = discipline, y = 0, yend = students_with_major)) +
+  coord_flip() 
+```
+
+
+Question 2 (10 points). Make the plot from Question 1 of the take-home quiz, but, instead of plotting the other majors of all of the STAT majors in the data set, plot the counts of the minors of all of the STAT majors.
+```{r}
+df_long_minors <- df |> 
+  filter(major1 == "STAT" | major2 == "STAT" | major3 == "STAT") |>
+  pivot_longer(3:8, names_to = "type", values_to = "discipline")
+
+df_minors <- df_long_minors |>
+  filter(type == "minor1" | type == "minor2" | type == "minor3") |>
+  filter(!is.na(discipline) & discipline != "STAT") %>%
+  group_by(discipline) |>
+  summarise(count_type = n()) |>
+  mutate(discipline = fct_reorder(.f = discipline, .x = count_type))
+
+ggplot(data = df_minors, aes(x = discipline,
+                               y = count_type)) +
+  geom_col() +
+  coord_flip()
+```
+
+
+Question 3 (5 points). Push your .Rmd and knitted .html file to GitHub, writing a one sentence commit message for your push.
+
+Extra Credit (1 point). For just a single point of extra credit (the purpose of this is mostly to give anyone who finishes the quiz early something to work on), figure out the “average” number of majors SLU students had over the past 5 years. For example, if the data only had three students: two single majors and one double major, the “average” number of majors would be (1 + 1 + 2) / 4 = 1.33 majors.
+
+
+--------------------------------
+
+Take Home Quiz 3
+
+Question 1 (5 points). Consider the Challenger example in our course notes. Clearly, the graphic used to communicate the results is poorly made: it eliminates data points when it really should not. However, the engineers making the graph did not have “malicious intent:” they did not purposefully remove these data points to try to lie: it was a mistake. Is the visualization still unethical? Use principles from the Modern Data Science Readings to explain in a few sentences.
+
+The visualization was unethical because it was not clarified that those data points were not included, which goes against multiple principles including "Present our work in ways that empower others to make better-informed decisions.". Also, if such an error was not caught, they likely did not "Respect and invite fair criticism while promoting the identification and open discussion of errors, risks, and unintended consequences of our work."
+
+Question 2 (4 points). Find a graphic online, other than any given in our course readings, that is unethical. Provide a link to your graphic and give a 2-3 sentence description explaining why that graphic is not ethical.
+https://i.pinimg.com/originals/0c/ae/61/0cae6187effa5f31171fde69659193eb.png
+has a misleading y axis that mitigates the presentation of actual represenatitve data.
+
+Question 3 (3 points). Explain, in your own words, what each of the following Git terms mean:
+
+commit - save to github
+
+push - upload to github
+
+pull - download from github
+
+Question 4 (3 points). These three points are given if you successfully committed with a commit message and pushed your .Rmd and .html files to your GitHub account.
+
+---------------------------------
+
+In Class Quiz 3
+
+Question 1 (5 points). Suppose you do the following:
+
+You go to your GitHub site and make a change to the README file (adding a sentence, for example).
+In R Studio, you update one of your .Rmd files, adding a line of code and commit the file.
+You attempt to push the new file to your GitHub site.
+Once you get to the third step, you’ll get an error when you try to push. Why? What do you need to do first before you make the push in Step 3?
+The changes made on github site did not align with offline, so first you must pull and then you can commit and push.
+
+Question 2 (6 points). Give 2 advantages of using Git and GitHub. These must be advantages that we discussed in class (so you should not simply google “advantages of Git” and give the first two things that pop up).
+First you have version control, so you have a history of your work to refer to. Second, it makes it easier to share code.
+
+Question 3 (6 points). Choose 1 of the 12 principles of the ethical practice of data science that you think is the most difficult to execute. Give a short, possibly hypothetical, example that illustrates how that principle could be difficult to follow.
+Recognize and mitigate bias in ourselves and in the data we use. This can be difficult since human nature is to find patterns, so for me in my mh research I often find I am searching for my hypothesis subconciously.
+
+Question 4 (6 points). The authors of Data Feminism argued that data scientists should “embrace emotion,” not ignore it when building visuals. State the example that the authors used to show how emotion can be used to make a visual stronger. Then, give an argument against “embracing emotion.” In other words, give an argument that data visualizations should be devoid of emotion as much as possible, even if that’s not what you believe.
+The map of lynchings across America. The argument against emotion would be that emotion creates bias rather than an unbiased portrayal of numbers and fact.
+
+Question 5 (2 points). These two points are given for committing your .Rmd and .html files with a commit message correctly, and pushing them to your GitHub site.
+
+
+
+-------------------------------------------
+
+6 MAPPING
+
+```{r}
+## install.packages("maps")
+library(maps)
+library(tidyverse)
+state_df <- ggplot2::map_data("state")
+ggplot(data = state_df,
+            mapping = aes(x = long, y = lat,
+                          group = group)) +
+  geom_polygon() 
+## better map version
+ggplot(data = state_df,
+            mapping = aes(x = long, y = lat,
+                          group = group)) +
+  geom_polygon(colour = "black", fill = "white") +
+  coord_map(projection = "albers", lat0 = 39, lat1 = 45) +
+  theme_void()
+## install.packages("usdata")
+library(usdata)
+state_stats
+state_stats <- state_stats %>% mutate(state = str_to_lower(state))
+state_full <- left_join(state_df, state_stats, by = c("region" = "state"))
+
+ggplot(data = state_full, aes(x = long, y = lat, group = group)) +
+  geom_polygon(colour = "black", aes(fill = coal)) +
+  coord_map(projection = "albers", lat0 = 39, lat1 = 45) +
+  theme_void() +
+  scale_fill_viridis_b()
+```
+
+Exercise 1. Which states had the fastest growth rate between 2000 and 2010? Make a variable for the percent change in population and then map this variable.
+```{r}
+state_full <- state_full %>% mutate(growth_rate = (pop2010 - pop2000)/pop2000)
+ggplot(data = state_full, aes(x = long, y = lat, group = group)) +
+  geom_polygon(colour = "black", aes(fill = growth_rate)) +
+  coord_map(projection = "albers", lat0 = 39, lat1 = 45) +
+  theme_void() +
+  scale_colour_viridis_d(palette = "Blues")
+```
+Arizona
+
+Exercise 2. To your map in Exercise 1, think about which type of colour scale makes the most sense to use (sequential, diverging, or unordered). Change the colour scale to match what makes the most sense.
+--------------
+You may have noticed a couple of additional problems in the United States maps we made in the previous section.
+
+We ignored Alaska and Hawaii. Putting these on the map in their geographic locations would result in a tiny continental United States map that would be harder to read.
+
+Some states in the Northeast are so small that their fill values are hard to read.
+
+Both of these issues can be challenging to address. It is common to put Hawaii and Alaska in a corner of the plot, even though their latitude and longitude values do not match. Sometimes Alaska is made to be smaller than its true size as well. The smaller Northeastern states is a more challenging problem. This is beyond the scope of this course (though not beyond the scope of part of a final project), but a hexbin map can solve both of these issues.
+
+Exercise 1. Think of a second example where, even though the data is spatial, the best graph to show a particular point would not be a map.
+
+
+Exercise 2. Refer back the United States examples that we completed in the earlier section. Choose a variable or two variables where a map makes the most sense to visualize that variable and explain your reasoning. Then, choose a variable or two variables where you might make a plot other than a map and explain your reasoning for why the map makes less sense for this variable.
+
+
+```{r}
+active <- read_csv("https://raw.githubusercontent.com/iramler/stlawu_covid/main/slc_towns_active_cases.csv", n_max = 34)
+tcases <- read_csv("https://raw.githubusercontent.com/iramler/stlawu_covid/main/slc_towns_total_cases.csv", n_max = 34)
+
+active_long <- active %>% pivot_longer(5:ncol(active), names_to = "date",
+                                       values_to = "cases")
+## repeat for total cases
+tcases_long <- tcases %>% pivot_longer(5:ncol(tcases), names_to = "date",
+                                       values_to = "cases")
+
+library(lubridate)
+covid_df <- left_join(tcases_long, active_long,
+                      by = c("date", "Order", "NAME")) %>%
+  mutate(date = mdy(date)) %>%
+  rename(total_cases = cases.x,
+         active_cases = cases.y) %>%
+  mutate(total_cases = if_else(is.na(total_cases),
+                               true = 0, false = total_cases),
+         active_cases = if_else(is.na(active_cases),
+                                      true = 0, false = active_cases))
+  
+
+covid_SLC <- covid_df %>% filter(NAME == "St. Lawrence County")
+covid_sub <- covid_df %>% filter(NAME != "St. Lawrence County")
+```
+
+Exercise 1. Make a line plot that shows the number of active_cases in all of St. Lawrence County over time.
+```{r}
+ggplot(data = covid_SLC, aes(x = date, y = active_cases)) +
+  geom_point()
+```
+
+
+```{r}
+## install.packages("sf")
+library(sf)
+shp <- read_sf("data/SLC_Civil_Boundaries_SHP/slc.shp") %>%
+  st_transform(st_crs("+proj=longlat"))
+ggplot(data = shp) +
+  geom_sf() +
+  theme_void()
+full_df <- left_join(shp, covid_sub, by = "NAME") %>%
+  filter(date == max(date)) ## only plot cases on the most recent date
+ggplot(data = full_df) +
+  geom_sf(aes(fill = active_cases)) +
+  theme_void()
+```
+Exercise 2. Change the fill scale of the plot. Should you use an unordered, sequential, or diverging scale?
+
+Exercise 3. Change the colour scale so that active_cases are put into different bins with scale_fill_viridis_b(). What are some advantages and disadvantages of this?
+```{r}
+ggplot(data = full_df) +
+  geom_sf(aes(fill = active_cases)) +
+  theme_void() +
+  scale_fill_viridis_b()
+```
+Clearly differentiates ranges, but not visually clear differences within bins.
+
+Exercise 4. Explore the ?geom_sf_text() function and add the actual number of cases to the subregions in the plot, as is done on the SLC website.
+```{r}
+ggplot(data = full_df) +
+  geom_sf(aes(fill = active_cases)) +
+  theme_void() +
+  geom_sf_text(aes(label = active_cases))
+```
+
+
+```{r}
+## install.packages("devtools")
+library(devtools)
+## devtools::install_github("li-wen-li/uszipcodes")
+library(uszipcodes)
+beers <- read_csv("data/breweries.csv") 
+raw_zip <- uszipcodes::get_zip(beers$address)
+beers$Zip <- as.integer(uszipcodes::clean_zip(raw_zip))
+
+## only keep zip, lat, and long
+zip_tab <- zip_table %>% dplyr::select(Zip, Latitude, Longitude)
+beer_location <- inner_join(beers, zip_tab)
+content <- beer_location %>%
+  mutate(popup = paste0('<a href =', beer_location$website, '>',
+                        beer_location$brewery_name, '</a>'))
+library(leaflet)
+
+beer_map <- leaflet(beer_location) %>%
+  setView(lng = -98.583, lat = 39.833, zoom = 4) %>% 
+  addTiles() %>% 
+  addProviderTiles(providers$Wikimedia) %>% 
+  addMarkers(lng = beer_location$Longitude, lat = beer_location$Latitude,
+             clusterOptions = markerClusterOptions(),
+             popup = content$popup)
+```
+Exercise 1. Why is inner_join() the most appropriate join function to use here in this example? What observations will an inner_join() get rid of from beers? from zip_tab?
+We will only be visualizing places where there is beer, and beers from which we can visualize the place.
+
+Exercise 2. Examine this link> to look at various “provider” tiles. Choose one to change from Wikimedia and explain how the resulting map looks different.
+
+Supplementary Mapping exercises
+Exericse 1. Make a map of a variable of your choosing. In coord_map(), use projection = "mercator", which is also the default (we will see in a later exercise that this probably is not the best choice).
+```{r}
+hpi_df <- read_csv("data/hpi-tidy.csv")
+world_df <- ggplot2::map_data("world")
+table(world_df$region)
+
+joined <- left_join(hpi_df, world_df, by = c("Country" = "region"))
+ggplot(data = joined,
+            mapping = aes(x = long, y = lat,
+                          group = group)) +
+  geom_polygon(colour = "black", aes(fill = Wellbeing)) +
+  coord_map(projection = "mercator") +
+  theme_void() + coord_map(xlim=c(-180,180))
+```
+
+
+Hint: in ggplot2’s map_data() function, there is a built in map of the "world".
+
+Hint: You can read more about projections in Section 17.3.2 of Modern Data Science with R
+
+Exercise 2. You may notice that the United States does not get coloured in your map. Examine this issue further and fix the map so that the United States is coloured.
+```{r}
+world_df <- ggplot2::map_data("world")
+ggplot(data = world_df,
+            mapping = aes(x = long, y = lat,
+                          group = group)) +
+  geom_polygon(colour = "black", aes(fill = "white")) +
+  coord_map(projection = "mercator") +
+  theme_void() + coord_map(xlim=c(-180,180))
+```
+
+
+Exercise 3. You may have noticed that there are two horizontal stripes across your map. This is an issue that drove me nuts! Check out this submitted issue on ggplot2’s GitHub page for the reason for the error as well as a fix. Use it to fix your plot.
+
+Exercise 4. Read about Mercator projections in this blog post. What does this source say about the sizes of Greenland vs. Africa in a Mercator projection.
+Greenland is 550% too big, it should fit into Africa 14 times
+
+Exercise 5. Examine all of the different options for map projection with ?mapproject. Then, change the projection to "globular". Change the projection again to "gilbert". How does the relative size of Greenland to Africa change in the projections?
+```{r}
+ggplot(data = world_df,
+            mapping = aes(x = long, y = lat,
+                          group = group)) +
+  geom_polygon(colour = "black", fill = "white") +
+  coord_map(projection = "globular") +
+  theme_void() 
+
+ggplot(data = world_df,
+            mapping = aes(x = long, y = lat,
+                          group = group)) +
+  geom_polygon(colour = "black", fill = "white") +
+  coord_map(projection = "gilbert") +
+  theme_void() 
+```
+
+------------------------
+
+QUIZ 4 TAKE HOME
+
+Use the leaflet package and the us.cities data set from the maps package to make a Zoom-able map of the 50 U.S. capital cities. When you click on a marker for a capital city, both the city name and state as well as the pop (population) should be displayed.
+
+Note that, in the us.cities data set, state capitals are given a value of 2 in the capital variable.
+
+A second note is that if you cannot figure out how to get two “things” (in this case name and population) to display in Leaflet, you would just lose a single point for the quiz (so don’t spend too much time on that part unless you are inclined to do so).
+
+```{r}
+library(leaflet)
+
+capitals <- us.cities %>% filter(capital == 2) %>%
+  mutate(popup = paste("Name: ", capitals$name))
+
+leaflet(capitals) %>%
+  setView(lng = -98.583, lat = 39.833, zoom = 4) %>% 
+  addTiles() %>%
+  addMarkers(lng = capitals$long, lat = capitals$lat,
+             popup = paste("Name: ", capitals$name, 
+                           "<br>", "Population: ", capitals$pop))
+```
+
+-------------------------
+
+7 Expressing Uncertainty and Variability
+
+```{r}
+library(tidyverse)
+pokemon_df <- read_csv("data/pokemon_full.csv")
+pokemon_height <- pokemon_df %>% 
+  filter(Type %in% c("Bug", "Electric", "Fighting", "Flying",
+                     "Grass", "Steel")) %>%
+  group_by(Type) %>%
+  summarise(avg_height = mean(height)) %>%
+  mutate(Type = fct_reorder(Type, avg_height))
+ggplot(data = pokemon_height, aes(x = Type, y = avg_height)) +
+  geom_col() +
+  coord_flip()
+```
+Exercise 1. What can’t we see from this graphic that would be useful?
+We cannot see the variability within each type.
+
+Exercise 2. Make a different plot that shows more relevant features about the underlying data.
+```{r}
+pokemon_new <- pokemon_df %>% 
+  filter(Type %in% c("Bug", "Electric", "Fighting", "Flying",
+                     "Grass", "Steel"))
+ggplot(data = pokemon_new, aes(x = Type, y = height)) +
+  geom_boxplot() +
+  coord_flip()
+```
+
+Exercise 3. Though we are arguing that bar plots are not generally good to show summaries of continuous data, when might we want to make a bar plot of a summary of continuous data anyway?
+When we are not taking an average but comparing counts?
+
+```{r}
+## install.packages("openintro")
+library(openintro)
+data(mlb_players_18)
+mlb_sum <- mlb_players_18 %>% group_by(position) %>%
+  summarise(med_hr = median(HR)) %>%
+  mutate(position = fct_reorder(position, med_hr))
+ggplot(data = mlb_sum, aes(x = position, y = med_hr)) +
+  geom_col() +
+  coord_flip()
+```
+Exercise 4. “Fix” the previous plot to show the underlying variability in the number of homeruns for each player position by making a set of boxplots.
+```{r}
+mlb_players_18 <- mlb_players_18 %>% group_by(position) %>%
+  mutate(sample_size = n())
+plot <- ggplot(data = mlb_players_18, aes(x = position, y = HR, label = sample_size)) +
+  geom_boxplot() +
+  coord_flip()
+```
+
+Exercise 5. Use the plotly package to give the sample size for each group when a user hovers over the boxes.
+```{r}
+library(plotly)
+ggplotly(plot, tooltip = "label")
+```
+Example 1.
+
+Consider a news channel covering a developing hurricane. Which of these types of graphs would better help the general public with the potential variability of the hurricane’s path?
+
+Option 1
+
+OR
+
+Option 2 -- because it shows the possible range
+
+Example 2.
+
+Next, consider fivethirtyeight.com’s coverage of the 2020 presidential election. Much of their forecast given on this page can be simply summarised by saying they predict Biden to win the election with 89% probability. So, why make the supplementary graphics that say the same thing but use a lot more space?
+Shows all the possible outcomes?
+
+Example 3.
+
+Next, consider a data set on National Football League teams, called standings.csv This data set contains the number of wins and losses for each team in very season from 2000 through 2019. In STAT/DATA 234, we made a graph that showed each team’s overall win percentage during this time period.
+Modify the chart so that it shows the variability in each team’s win percentage from season to season.
+
+```{r}
+nfl_df <- read_csv("data/standings.csv")
+nfl_sum <- nfl_df %>% group_by(team, year) %>%
+  summarise(nwins = sum(wins),
+            nlosses = sum(loss)) %>%
+  mutate(ngames = nwins + nlosses,
+         win_percentage = 100 * nwins / ngames) %>%
+  mutate(team = fct_reorder(team, win_percentage))
+ggplot(data = nfl_sum, aes(x = team, y = win_percentage)) +
+  geom_boxplot() +
+  geom_segment(aes(x = team, xend = team, y = 0, yend = win_percentage)) +
+  coord_flip() +
+  labs(y = "Win Percentage")
+```
+
+Example 4.
+
+When we fit a linear regression model to a sample of data, we know that there is sampling variability. 
+
+```{r}
+set.seed(231491)
+n <- 50
+beta0 <- 4
+beta1 <- -2
+x <- 1:n
+epsilon <- rnorm(n, 0, 75)
+y <- beta0 + beta1 * x + epsilon
+df <- tibble(x = x, y = y)
+ggplot(data = df, aes(x = x, y = y)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+sim_reg <- function(n = 50, beta0 = 4, beta1 = -2, s_eps = 75) {
+  x = 1:n
+  epsilon <- rnorm(n, 0, 75)
+
+  y <- beta0 + beta1 * x + epsilon
+  df <- tibble(x = x, y = y)
+  
+  mod <- lm(y ~ x, data = df) 
+  coefs <- mod$coefficients
+  return(coefs)
+}
+sim_reg()
+
+
+output <- purrr::rerun(1000, sim_reg())
+reg_df <- bind_rows(output) %>% rename(intercept = `(Intercept)`, slope = x)
+true_df <- tibble(intercept = 4, slope = -2)
+
+ggplot(data = reg_df) +
+  geom_abline(aes(intercept = intercept, slope = slope), alpha = 0.05) +
+  xlim(c(0, n + 1)) +
+  ylim(c(4 - 2 * 75 - 50, 4 - 2 * 0 + 50)) +
+  geom_abline(data = true_df, aes(intercept = intercept, slope = slope),
+              colour = "red") +
+  labs(x = "x",
+       y = "response")
+statsurvey_df <- read_csv("data/stat113_survey.csv")
+```
+First, is there evidence from the STAT 113 survey that tattoos have become more or less common (at least among SLU students). Second, is there evidence of grade inflation at SLU? That is, is there evidence that student GPAs have increased over time?
+```{r}
+tatoos <- statsurvey_df %>% 
+  select(Tattoo, Year) %>%
+  mutate(Year = as.factor(Year)) %>%
+  filter(!is.na(Tattoo), !is.na(Year)) %>%
+  group_by(Year) %>%
+  mutate(stu_tot = n()) %>%
+  ungroup() %>%
+  filter(Tattoo == "Yes") %>%
+  group_by(Year) %>%
+  mutate(tat_tot = n()) %>%
+  ungroup() %>%
+  summarize(Year = Year, tat_perc = tat_tot/stu_tot)
+ggplot(data = tatoos, aes(x = Year, y = tat_perc)) +
+  geom_col()
+
+gpa <- statsurvey_df %>% 
+  select(GPA, Year) %>%
+  filter(!is.na(Year), !is.na(GPA)) %>%
+   mutate(Year = as.factor(Year))
+ggplot(data = gpa, aes(x = Year, y = GPA)) +
+  geom_boxplot()
+
+gpa_rmv_outlier <- statsurvey_df %>% 
+  select(GPA, Year) %>%
+  filter(!is.na(Year), !is.na(GPA), GPA <= 4) %>%
+   mutate(Year = as.factor(Year))
+ggplot(data = gpa_rmv_outlier, aes(x = Year, y = GPA)) +
+  geom_boxplot()
+```
+
+------------------------
+
+QUIZ 4 IN CLASS
+
+Question 1 (20 points). Examine the alcohol.csv data set that you may have used as an introductory data set in STAT/DATA 234:
+
+```{r}
+library(tidyverse)
+library(here)
+alcohol_df <- read_csv(here("data/alcohol.csv"))
+```
+
+The data set has the following variables on countries throughout the world:
+
+country, the name of the country
+beer_servings, the number of beer servings per person per year
+spirit_servings, the number of spirit servings per person per year
+wine_servings, the number of wine servings per person per year
+total_litres_of_pure_alcohol, the number of litres of pure alcohol consumed per person per year
+Construct a map of the beer_servings variable. You should choose an appropriate projection and change the default colour scheme of your map.
+```{r}
+world_df <- ggplot2::map_data("world")
+world_beer <- left_join(alcohol_df, world_df, by = c("country" = "region"))
+
+ggplot(data = world_beer, aes(x = long, y = lat, group = group)) +
+  geom_polygon(colour = "black", aes(fill = beer_servings)) +
+  coord_map(projection = "mercator", xlim=c(-180,180)) +
+  theme_void() +
+  scale_fill_viridis_c()
+
+ggplot(data = world_df,
+            mapping = aes(x = long, y = lat,
+                          group = group)) +
+  geom_polygon(colour = "black", fill = "white") +
+  coord_map(projection = "mercator") +
+  theme_void() + coord_map(xlim=c(-180,180))
+```
+
+
+Question 2 (5 points). Give an example of a question of interest about the alcohol data where you would want to construct a visualization other than a map to answer the question. What type of visualization would you construct instead?
+A visualization in which you are comparing the three types of consumption per country. I would do a faceted lollipop graph.
+
+---------------------------------------------------
+
+9 Introduction to Shiny
+
+Non shiny starting point
+```{r}
+library(tidyverse)
+library(readxl)
+df <- read_excel("data/slu_graduates_17_21.xlsx")
+
+## fixes error in the data
+df <- df %>% mutate(across(everything(),
+                           .fns = ~replace(., . ==  "STATS" , "STAT")))
+
+df_long <- df %>% pivot_longer(3:8, names_to = "type", values_to = "discipline")
+df_major <- df_long %>% 
+  filter(type == "major1" | type == "major2" | type == "major3")
+
+df_stat <- df_major %>% filter(discipline == "STAT") 
+df_statfull <- semi_join(df_long, df_stat, by = "adm_id") %>%
+  filter(type == "major1" |
+           type == "major2" | 
+           type == "major3")
+
+df_nostat <- df_statfull %>% filter(discipline != "STAT" &
+                              !is.na(discipline)) %>%
+  group_by(discipline) %>%
+  summarise(nstudent = n()) %>%
+  mutate(discipline = fct_reorder(discipline, nstudent))
+ggplot(data = df_nostat, aes(x = discipline, y = nstudent)) +
+  geom_col() +
+  coord_flip()
+```
+
+Shiny
+```{r}
+## install.packages("shiny")
+library(shiny)
+```
+
+```{r}
+#typed shinyapp and clicked the snippet to create this
+library(shiny)
+
+ui <- fluidPage(
+  
+)
+
+server <- function(input, output, session) {
+  
+}
+
+shinyApp(ui, server)
+```
+
+```{r}
+library(shiny)
+ui <- fluidPage(
+  selectInput("dataset", label = "Dataset", choices = ls("package:datasets")),
+  verbatimTextOutput("summary"),
+  tableOutput("table")
+)
+server <- function(input, output, session) {
+  output$summary <- renderPrint({
+    dataset <- get(input$dataset, "package:datasets")
+    summary(dataset)
+  })
+  
+  output$table <- renderTable({
+    dataset <- get(input$dataset, "package:datasets")
+    dataset
+  })
+}
+shinyApp(ui, server)
+```
+
+Reactive expressions 
+```{r}
+ui <- fluidPage(
+  selectInput("dataset", label = "Dataset", choices = ls("package:datasets")),
+  verbatimTextOutput("summary"),
+  tableOutput("table")
+)
+server <- function(input, output, session) {
+  # Create a reactive expression
+  dataset <- reactive({
+    get(input$dataset, "package:datasets")
+  })
+
+  output$summary <- renderPrint({
+    # Use a reactive expression by calling it like a function
+    summary(dataset())
+  })
+  
+  output$table <- renderTable({
+    dataset()
+  })
+}
+shinyApp(ui, server)
+```
+
+9.3 The SLU Majors App
+
+Step 1: Build a static version of the app you want to create. Typically, to do this, you’ll have to choose particular values for what you want the user of the app to eventually be able to change. We have already completed this step by making the graph for STAT majors.
+
+
+Step 2: Decide on and set up an input for the User Interface, UI. We will do this as a class.
+```{r}
+df_nomiss <- df_major %>% filter(!is.na(discipline)) %>%
+  mutate(discipline = factor(discipline))
+majors <- levels(df_nomiss$discipline)
+
+ui <- fluidPage(
+  sidebarLayout(
+    sidebarPanel(selectInput("majorchoice", label = "Choose a Major",
+                             choices = majors)),
+    mainPanel()
+  )
+)
+
+server <- function(input, output, session) {
+  
+}
+
+shinyApp(ui, server)
+```
+
+
+Step 3: Put the static graph (or table) in the server function.
+```{r}
+ui <- fluidPage(
+  sidebarLayout(
+    sidebarPanel(selectInput("majorchoice", label = "Choose a Major",
+                             choices = majors)),
+    mainPanel(plotOutput("m_plot"))
+  )
+)
+
+server <- function(input, output, session) {
+  
+  df_stat <- df_major %>% filter(discipline == "STAT") 
+  df_statfull <- semi_join(df_long, df_stat, by = "adm_id") %>%
+    filter(type == "major1" |
+             type == "major2" | 
+             type == "major3")
+  
+  df_nostat <- df_statfull %>% filter(discipline != "STAT" &
+                                        !is.na(discipline)) %>%
+    group_by(discipline) %>%
+    summarise(nstudent = n()) %>%
+    mutate(discipline = fct_reorder(discipline, nstudent))
+  
+  
+  major_plot <- ggplot(data = df_nostat, aes(x = discipline, y = nstudent)) +
+    geom_col() +
+    coord_flip()
+  
+  output$m_plot <- renderPlot({
+    major_plot
+  })
+}
+
+shinyApp(ui, server)
+```
+
+
+Step 4: Connect the UI selection input to the server, possibly creating a reactive value. Anything that is reactive must go inside a reactive({}) expression, or a render_({}) expression.
+```{r}
+## step 4: connect UI selection to server, creating a reactive value
+## anything that is reactive must go inside a reactive({}) expression
+
+df_nomiss <- df_major %>% filter(!is.na(discipline)) %>%
+  mutate(discipline = factor(discipline))
+majors <- levels(df_nomiss$discipline)
+
+ui <- fluidPage(
+  sidebarLayout(
+    sidebarPanel(selectInput("majorchoice", label = "Choose a Major",
+                             choices = majors)),
+    mainPanel(plotOutput("m_plot"))
+  )
+)
+
+server <- function(input, output, session) {
+  
+  
+  major_reactive_df <- reactive({
+    
+    df_stat <- df_major %>% filter(discipline == input$majorchoice) 
+  df_statfull <- semi_join(df_long, df_stat, by = "adm_id") %>%
+    filter(type == "major1" |
+             type == "major2" | 
+             type == "major3")
+  
+  df_nostat <- df_statfull %>% filter(discipline != input$majorchoice &
+                                        !is.na(discipline)) %>%
+    group_by(discipline) %>%
+    summarise(nstudent = n()) %>%
+    mutate(discipline = fct_reorder(discipline, nstudent))
+  })
+  
+  
+  
+  major_plot <- reactive({
+    ggplot(data = major_reactive_df(), aes(x = discipline, y = nstudent)) +
+    geom_col() +
+    coord_flip()
+  })
+  
+  output$m_plot <- renderPlot({
+    major_plot()
+  })
+}
+
+shinyApp(ui, server)
+```
+
+9.4 Tennis App
+```{r}
+atp_df <- read_csv("data/atp_matches_2019.csv")
+wta_df <- read_csv("data/wta_matches_2019.csv")
+both_df <- bind_rows(atp_df, wta_df)
+
+both_long <- both_df %>% pivot_longer(c(winner_name, loser_name))
+
+## only keep players who have player over 50 matches
+both_n50 <- both_long %>% group_by(value) %>% count() %>%
+  filter(n > 50)
+
+## construct various statistics
+major_tennis <- semi_join(both_long, both_n50, by = c("value"))
+major_tennis <- major_tennis %>% mutate(w_svperc = 100 * w_1stIn / w_svpt,
+                        l_svperc = 100 * l_1stIn / l_svpt,
+                        w_firstwon = 100 * w_1stWon / w_1stIn,
+                        l_firstwon = 100 * l_1stWon / l_1stIn,
+                        w_secondwon = 100 * w_2ndWon / (w_svpt - w_1stIn),
+                        l_secondwon = 100 * l_2ndWon / (l_svpt - l_1stIn))
+major_tennis_w <- major_tennis %>% filter(name == "winner_name")
+major_tennis_l <- major_tennis %>% filter(name == "loser_name")
+
+w_small <- major_tennis_w %>% select(value, winner_seed, w_ace, w_df, w_svperc,
+                                     w_firstwon, w_secondwon) %>%
+  rename(seed = winner_seed, ace = w_ace, df = w_df, svperc = w_svperc,
+         firstwon = w_firstwon, secondwon = w_secondwon)
+
+l_small <- major_tennis_l %>% select(value, loser_seed, l_ace, l_df, l_svperc, l_firstwon, l_secondwon)  %>%
+  rename(seed = loser_seed, ace = l_ace, df = l_df, svperc = l_svperc,
+         firstwon = l_firstwon, secondwon = l_secondwon)
+
+df <- bind_rows(w_small, l_small) %>%
+  rename(player = "value")
+df
+```
+
+Step 1: Make a histogram of one variable for one specific player.
+```{r}
+df_sub <- df %>% filter(player == "Daniil Medvedev")
+ggplot(df_sub, aes(x = ace)) +
+  geom_histogram(colour = "black", fill = "white", bins = 15)
+```
+
+
+Step 2: Set up our shiny app inputs. Before, we just had a single input. Now, we will have two: one for player and one for variable. Let’s focus on one at a time, doing player first. Type shinyapp and click on the R Studio snippet to bring up a base app.
+```{r}
+ui <- fluidPage(
+  sidebarLayout(sidebarPanel(
+    selectizeInput("playerchoice",
+    label = "Choose a Player", choices = levels(factor(df$player)),
+    selected = "Aryna Sabalenka")),
+                mainPanel()
+                )
+)
+
+server <- function(input, output, session) {
+  
+}
+
+shinyApp(ui, server)
+```
+
+
+Step 3: Now that we have one of our inputs in the UI, let’s work on the server. First, we will ignore the input$ selector and put in our graph of aces for Medvedev. We again use the plotOutput(), renderPlot({}) combination.
+```{r}
+ui <- fluidPage(
+  sidebarLayout(sidebarPanel(
+    selectizeInput("playerchoice",
+    label = "Choose a Player", choices = levels(factor(df$player)),
+    selected = "Aryna Sabalenka")),
+                mainPanel(plotOutput("histgraph"))
+                )
+)
+
+server <- function(input, output, session) {
+  df_sub <- df %>% filter(player == "Daniil Medvedev")
+  hist_plot <- ggplot(df_sub, aes(x = ace)) +
+    geom_histogram(colour = "black", fill = "white", bins = 15)
+  
+  output$histgraph <- renderPlot({ #what is histgraph??
+    hist_plot
+  })
+} 
+
+shinyApp(ui, server)
+```
+
+
+Step 4: Now we want to connect the input defined in the UI to the server so that the graph changes depending on which player we select.
+```{r}
+ui <- fluidPage(
+  sidebarLayout(sidebarPanel(
+    selectizeInput("playerchoice",
+    label = "Choose a Player", choices = levels(factor(df$player)),
+    selected = "Aryna Sabalenka")),
+                mainPanel(plotOutput("histgraph"))
+                )
+)
+
+server <- function(input, output, session) {
+  
+  df_sub <- reactive({
+    df %>% filter(player == input$playerchoice)
+  })
+  
+  hist_plot <- reactive({
+    ggplot(df_sub(), aes(x = ace)) +
+    geom_histogram(colour = "black", fill = "white", bins = 15)
+  })
+  
+  output$histgraph <- renderPlot({
+    hist_plot()
+  })
+}
+
+shinyApp(ui, server)
+```
+
+
+Step 5: Now we repeat some of these steps for a second input: a variable that the user selects. We will use radioButtons() as the input in the UI.
+```{r}
+## step 5
+var_choices <- names(df)[3:7]
+
+library(shiny)
+
+ui <- fluidPage(
+  sidebarLayout(sidebarPanel(
+    selectizeInput("playerchoice",
+                   label = "Choose a Player", choices = levels(factor(df$player)),
+                   selected = "Aryna Sabalenka"),
+    radioButtons("varchoice", label = "Choose a Statistic",
+                 choices = var_choices)),
+    mainPanel(plotOutput("histgraph"))
+  )
+)
+
+server <- function(input, output, session) {
+  
+  df_sub <- reactive({
+    df %>% filter(player == input$playerchoice)
+  })
+  
+  
+  hist_plot <- reactive({
+    # ggplot(df_sub(), aes_string(x = input$varchoice)) +
+    # geom_histogram(colour = "black", fill = "white", bins = 15)
+    ggplot(df_sub(), aes(x = .data[[input$varchoice]])) +
+      geom_histogram(colour = "black", fill = "white", bins = 15)
+  })
+  
+  output$histgraph <- renderPlot({
+    hist_plot()
+  })
+}
+
+shinyApp(ui, server)
+```
+
+
+We will discuss why we need to take some extra steps to perform the “user can select a variable” operation in class. In particular, we will need to briefly discuss tidy evaluation to use some of the tidyverse functions in shiny.
+
+Step 6: Finally, we will add a third input that will let the user change the number of bins in the histogram.
+```{r}
+## step 6
+var_choices <- names(df)[3:7]
+
+library(shiny)
+
+ui <- fluidPage(
+  sidebarLayout(sidebarPanel(
+    selectizeInput("playerchoice",
+                   label = "Choose a Player", choices = levels(factor(df$player)),
+                   selected = "Aryna Sabalenka"),
+    radioButtons("varchoice", label = "Choose a Statistic",
+                 choices = var_choices),
+    sliderInput("binnumber", label = "Choose a Number of Bins", 
+                min = 1, max = 50, value = 15, step = 1)),
+    mainPanel(plotOutput("histgraph"))
+  )
+)
+
+server <- function(input, output, session) {
+  
+  df_sub <- reactive({
+    df %>% filter(player == input$playerchoice)
+  })
+  
+  hist_plot <- reactive({
+    # ggplot(df_sub(), aes_string(x = input$varchoice)) +
+    # geom_histogram(colour = "black", fill = "white", bins = 15)
+    ggplot(df_sub(), aes(x = .data[[input$varchoice]])) +
+      geom_histogram(colour = "black", fill = "white", bins = input$binnumber) +
+      theme_grey(base_size = 22)
+  })
+  
+  output$histgraph <- renderPlot({
+    hist_plot()
+  })
+  
+
+}
+
+shinyApp(ui, server)
+```
+
+9.6 Additional Reading and Exercises
+Read the UI Chapter of Mastering Shiny
+
+Exercise 1. In the tennis app, change the histogram input from a sliderInput() to a numericInput().
+
+```{r}
+var_choices <- names(df)[3:7]
+
+library(shiny)
+
+ui <- fluidPage(
+  sidebarLayout(sidebarPanel(
+    selectizeInput("playerchoice",
+                   label = "Choose a Player", choices = levels(factor(df$player)),
+                   selected = "Aryna Sabalenka"),
+    radioButtons("varchoice", label = "Choose a Statistic",
+                 choices = var_choices),
+    numericInput("binnumber", label = "Choose a Number of Bins", 
+                min = 1, max = 50, value = 15, step = 1)),
+    mainPanel(plotOutput("histgraph"))
+  )
+)
+
+server <- function(input, output, session) {
+  
+  df_sub <- reactive({
+    df %>% filter(player == input$playerchoice)
+  })
+  
+  hist_plot <- reactive({
+    # ggplot(df_sub(), aes_string(x = input$varchoice)) +
+    # geom_histogram(colour = "black", fill = "white", bins = 15)
+    ggplot(df_sub(), aes(x = .data[[input$varchoice]])) +
+      geom_histogram(colour = "black", fill = "white", bins = input$binnumber) +
+      theme_grey(base_size = 22)
+  })
+  
+  output$histgraph <- renderPlot({
+    hist_plot()
+  })
+  
+
+}
+
+shinyApp(ui, server)
+```
+
+
+Exercise 2. In the tennis app, change the histogram input back to sliderinput(). Then, apply 2.2.8 Exercise 3 in Mastering Shiny to the tennis app slider. 
+DOES THIS INCLUDE ANIMATION? (add animation to the input widget so when the user presses play the input widget scrolls through the range automatically.)
+```{r}
+var_choices <- names(df)[3:7]
+
+library(shiny)
+
+ui <- fluidPage(
+  sidebarLayout(sidebarPanel(
+    selectizeInput("playerchoice",
+                   label = "Choose a Player", choices = levels(factor(df$player)),
+                   selected = "Aryna Sabalenka"),
+    radioButtons("varchoice", label = "Choose a Statistic",
+                 choices = var_choices),
+    sliderInput("binnumber", label = "Choose a Number of Bins", 
+                min = 0, max = 100, value = 15, step = 5)),
+    mainPanel(plotOutput("histgraph"))
+  )
+)
+
+server <- function(input, output, session) {
+  
+  df_sub <- reactive({
+    df %>% filter(player == input$playerchoice)
+  })
+  
+  hist_plot <- reactive({
+    # ggplot(df_sub(), aes_string(x = input$varchoice)) +
+    # geom_histogram(colour = "black", fill = "white", bins = 15)
+    ggplot(df_sub(), aes(x = .data[[input$varchoice]])) +
+      geom_histogram(colour = "black", fill = "white", bins = input$binnumber) +
+      theme_grey(base_size = 22)
+  })
+  
+  output$histgraph <- renderPlot({
+    hist_plot()
+  })
+  
+
+}
+
+shinyApp(ui, server)
+```
+
+Exercise 3. In the SLU majors app, change the major input to radioButtons() so that the user can only select mathematics, statistics, or computer science as the major.
+```{r}
+df <- read_excel("data/slu_graduates_17_21.xlsx")
+
+## fixes error in the data
+df <- df %>% mutate(across(everything(),
+                           .fns = ~replace(., . ==  "STATS" , "STAT")))
+
+df_long <- df %>% pivot_longer(3:8, names_to = "type", values_to = "discipline")
+df_major <- df_long %>% 
+  filter(type == "major1" | type == "major2" | type == "major3")
+
+df_nomiss <- df_major %>% filter(!is.na(discipline)) %>%
+  mutate(discipline = factor(discipline)) %>% 
+  filter(discipline == "MATH" | 
+           discipline == "STAT" |
+           discipline == "CS")
+
+#why including all the disciplines
+majors <- levels(df_nomiss$discipline) 
+
+ui <- fluidPage(
+  sidebarLayout(
+    sidebarPanel(radioButtons("majorchoice", label = "Choose a Major",
+                             choices = df_nomiss$discipline)),
+    mainPanel(plotOutput("m_plot"))
+  )
+)
+
+server <- function(input, output, session) {
+  
+  
+  major_reactive_df <- reactive({
+    
+    df_choice <- df_nomiss %>% filter(discipline == input$majorchoice) 
+  df_full <- semi_join(df_long, df_choice, by = "adm_id") %>%
+    filter(type == "major1" |
+             type == "major2" | 
+             type == "major3")
+  
+  df_nochoice <- df_full %>% filter(discipline != input$majorchoice &
+                                        !is.na(discipline)) %>%
+    group_by(discipline) %>%
+    summarise(nstudent = n()) %>%
+    mutate(discipline = fct_reorder(discipline, nstudent))
+  })
+  
+  
+  
+  major_plot <- reactive({
+    ggplot(data = major_reactive_df(), aes(x = discipline, y = nstudent)) +
+    geom_col() +
+    coord_flip()
+  })
+  
+  output$m_plot <- renderPlot({
+    major_plot()
+  })
+}
+
+shinyApp(ui, server)
+```
+
+
+Exercise 4. In the SLU majors app, add a table output below the plot that shows the number of Female majors and the number of Male majors for a major that the user selects.
+```{r}
+library(knitr)
+library(readxl)
+df <- read_excel("data/slu_graduates_17_21.xlsx")
+
+## fixes error in the data
+df <- df %>% mutate(across(everything(),
+                           .fns = ~replace(., . ==  "STATS" , "STAT")))
+
+df_long <- df %>% pivot_longer(3:8, names_to = "type", values_to = "discipline")
+df_major <- df_long %>% 
+  filter(type == "major1" | type == "major2" | type == "major3")
+
+df_nomiss <- df_major %>% filter(!is.na(discipline)) %>%
+  mutate(discipline = factor(discipline)) 
+majors <- levels(df_nomiss$discipline) 
+
+ui <- fluidPage(
+  sidebarLayout(
+    sidebarPanel(selectInput("majorchoice", label = "Choose a Major",
+                             choices = majors)),
+    mainPanel(plotOutput("m_plot"), tableOutput("m_table"))
+  )
+)
+
+server <- function(input, output, session) {
+  
+  
+  major_reactive_df <- reactive({
+    
+    df_stat <- df_major %>% filter(discipline == input$majorchoice) 
+  df_statfull <- semi_join(df_long, df_stat, by = "adm_id") %>%
+    filter(type == "major1" |
+             type == "major2" | 
+             type == "major3")
+  
+  df_nostat <- df_statfull %>% filter(discipline != input$majorchoice &
+                                        !is.na(discipline)) %>%
+    group_by(discipline) %>%
+    summarise(nstudent = n()) %>%
+    mutate(discipline = fct_reorder(discipline, nstudent))
+  })
+  
+  
+  
+  major_plot <- reactive({
+    ggplot(data = major_reactive_df(), aes(x = discipline, y = nstudent)) +
+    geom_col() +
+    coord_flip()
+  })
+  
+  output$m_plot <- renderPlot({
+    major_plot()
+  })
+  
+  
+    
+sex_reactive_df <- reactive({
+    
+    df_stat <- df_major %>% filter(discipline == input$majorchoice) 
+  df_statfull <- semi_join(df_long, df_stat, by = "adm_id") %>%
+    filter(type == "major1" |
+             type == "major2" | 
+             type == "major3")
+  
+  df_nostat <- df_statfull %>% filter(discipline != input$majorchoice &
+                                        !is.na(discipline)) %>%
+    group_by(discipline) %>%
+    mutate(nstudent = n()) %>%
+    ungroup() %>%
+    filter(sex == "F") %>%
+    group_by(discipline)
+    summarise(fems = n(), males = nstudent - fems)
+  })
+
+  output$m_table <- renderTable({
+    head(sex_reactive_df()) #WHY THIS TABLE NOT WORK
+  })
+}
+
+shinyApp(ui, server)
+```
+
+--------------------------------------------------
+
+TAKE HOME QUIZ 5
+
+Use the STAT 113 survey data set to explore the trend in the popularity of Facebook over time. Do this in 2 ways:
+```{r}
+library(tidyverse)
+stat <- read_csv("data/stat113_survey.csv") %>% filter(!is.na(Facebook), !is.na(Year)) %>% filter(GPA <= 4)
+```
+
+(7 points). Construct a graph that uses the number of Facebook friends each student has. CHANGE OVER TIME
+```{r}
+ggplot(stat, aes(x = factor(time_year), y = Facebook)) +
+  geom_boxplot() #fct_inorder() = graphs in order of column in df
+
+fb_mean <- stat %>% group_by(time_both) %>% filter(!is.na(Facebook)) %>%
+  summarise(mean = mean(Facebook, na.rm = TRUE),
+            nstudent = n(),
+            sdfacebook = sd(Facebook, na.rm = TRUE)) %>%
+  mutate(se = sdfacebook / sqrt(nstudent), se_1 = mean - se,
+         se_u = mean + se) %>%
+  mutate(time_both = fct_drop(time_both))
+
+ggplot(stat %>% filter(!is.na(Facebook)),
+       aes(x = time_both, y = Facebook)) +
+  geom_point(alpha = .1) +
+  geom_point(data = fb_mean, aes(x = time_both, y = mean), color = "red") +
+  geom_errorbar(data = fb_mean, aes(y=mean, ymin = se_1, ymax = se_u))
+```
+
+(7 points). Construct a graph that uses the proportion of students that have Facebook (assuming that 0 friends means that the student does not have a Facebook account and more than 0 friends means that the student does have a Facebook account).
+```{r}
+stat_face <- stat %>% 
+  group_by(time_year) %>%
+  mutate(tot = n()) %>% 
+  ungroup() %>%
+  filter(Facebook >0) %>% 
+  group_by(Year) %>%
+  mutate(Face = n()) %>%
+  ungroup() %>%
+  summarize(time_year = time_year, prop = Face/tot) 
+
+ggplot(stat_face, aes(x = time_year, y = prop)) +
+  geom_col()
+```
+
+1 point is provided for committing and pushing to GitHub correctly.
+
+-----------------------------------------------------
+
+QUIZ 5 IN CLASS
+
+Question 1 (7 points). Consider the following two bar plots using the palmerpenguins data set. The first is a plot of the penguin species while the second is a plot of the average bill length for each species.
+The first graph because the second give a singular value for an average without showing the variance in the data.
+
+Question 2 (9 points). Use the Happy Planet Index data set to construct a graph that does not properly show variability in the underlying data. Recall that some variables in this data set are LifeExpectancy, Wellbeing, Footprint, and Region of the world.
+
+```{r}
+library(tidyverse)
+library(here)
+hpi_df <- read_csv(here("data/hpi-tidy.csv"))
+ggplot(hpi_df, aes(x = Region, y = mean(LifeExpectancy))) +
+  geom_col()
+```
+
+Question 3 (7 points). Fix your graph from the previous question so that it does properly show variability in the underlying data.
+```{r}
+library(tidyverse)
+library(here)
+hpi_df <- read_csv(here("data/hpi-tidy.csv"))
+ggplot(hpi_df, aes(x = Region, y = LifeExpectancy)) +
+  geom_boxplot()
+
+ggplot(hpi_df, aes(x = Footprint)) +
+  geom_freqpoly(aes(color = Region), bins = 10) +
+  scale_colour_viridis_d()
+```
+
+The remaining 2 points are given for committing and pushing your .Rmd and .html files correctly to GitHub.
+
+
+-----------------------------------------
+TAKE HOME QUIZ 6
+
+Construct a Shiny app for any data set that we have worked with so far (besides SLU Majors and Tennis) or for any data set you used in STAT/DATA 234. Thirteen points will be given for Shiny apps that:
+
+run,
+have at least 2 different inputs,
+have at least 1 plot output that looks presentable (e.g. appropriate labels, colour scale, and makes sense to construct).
+Then, write a 2 sentence description about the purpose of your app (2 points).
+
+An app to look at the vaarious sports and the relation to age and variables of money making. This includes salary, total pay, and endorsements.
+
+Note that the in class version of the quiz will prompt you to use an app that has a sidebarLayout(). You do not need to use this function on the take-home quiz, but it may be helpful to use it for extra practice.
+
+stagnant graph
+```{r}
+library(tidyverse)
+athlete <- read_csv("data/athletesdata.csv") 
+  
+athlete_test <- athlete %>% filter(Sport == "Baseball")
+
+ggplot(data = athlete_test, 
+       aes(x = age, y = salary)) +
+  geom_point()
+```
+
+
+```{r}
+var_choices <- names(athlete)[5:7]
+
+library(shiny)
+
+ui <- fluidPage(
+  sidebarLayout(
+    sidebarPanel(selectInput("sportchoice", 
+                             label = "Choose a Sport",
+                             choices = levels(factor(athlete$Sport))),
+                 radioButtons("varchoice", label = "Choose a Statistic",
+                 choices = var_choices)),
+    mainPanel(plotOutput("plot"))
+    )
+)
+
+server <- function(input, output, session) {
+  athlete_test <- reactive({
+    athlete %>% filter(Sport == input$sportchoice)
+  })
+  
+  plot_test <- reactive({
+    ggplot(data = athlete_test(), 
+       aes(x = age, y = .data[[input$varchoice]])) +
+  geom_point()
+  })
+    
+  output$plot <- renderPlot({
+    plot_test()
+  })
+}
+
+shinyApp(ui, server)
+```
+
+
+--------------------------------------------
+QUIZ 6 IN CLASS
+
+Question 1 (6 points). Using the SLU Majors data set, give an example of a situation where you would construct a static graph instead of an interactive graph. Why would the static graph be better?
+If we wanted a bar graph with each discipline and the number of students majoring in that discipline -- the shiny app allowing us to choose the sex of the student. Nothing would be changing in terms of the graph, as the input value (majors) and the measurement (num of students) remains constant.
+
+OR if we wanted to show minors associated with a specific major (cuz no gaurantee that a user would select that major)
+
+
+Question 2 (17 points). Consider this version of the Tennis App from class:
+
+Add a plot below the histogram that is a side-by-side boxplot for comparing a serving statistic of two players. The user should be able to select the two players as well as the statistic being compared.
+
+Hint: You’ll need to create both a new input (for the second player) and a new output (for the second graph).
+
+Hint 2: The histogram may now have data from both players. There is no need to fix this so that it only shows one player’s stats.
+
+```{r}
+library(shiny); library(tidyverse)
+atp_df <- read_csv("data/atp_matches_2019.csv")
+wta_df <- read_csv("data/wta_matches_2019.csv")
+both_df <- bind_rows(atp_df, wta_df)
+
+both_long <- both_df %>% pivot_longer(c(winner_name, loser_name))
+
+## only keep players who have player over 50 matches
+both_n50 <- both_long %>% group_by(value) %>% count() %>%
+  filter(n > 50)
+
+## construct various statistics
+major_tennis <- semi_join(both_long, both_n50, by = c("value"))
+major_tennis <- major_tennis %>% mutate(w_svperc = 100 * w_1stIn / w_svpt,
+                        l_svperc = 100 * l_1stIn / l_svpt,
+                        w_firstwon = 100 * w_1stWon / w_1stIn,
+                        l_firstwon = 100 * l_1stWon / l_1stIn,
+                        w_secondwon = 100 * w_2ndWon / (w_svpt - w_1stIn),
+                        l_secondwon = 100 * l_2ndWon / (l_svpt - l_1stIn))
+
+major_tennis_w <- major_tennis %>% filter(name == "winner_name")
+major_tennis_l <- major_tennis %>% filter(name == "loser_name")
+
+w_small <- major_tennis_w %>% select(value, winner_seed, w_ace, w_df, w_svperc,
+                                     w_firstwon, w_secondwon) %>%
+  rename(seed = winner_seed, ace = w_ace, df = w_df, svperc = w_svperc,
+         firstwon = w_firstwon, secondwon = w_secondwon)
+
+l_small <- major_tennis_l %>% select(value, loser_seed, l_ace, l_df, l_svperc, l_firstwon, l_secondwon)  %>%
+  rename(seed = loser_seed, ace = l_ace, df = l_df, svperc = l_svperc,
+         firstwon = l_firstwon, secondwon = l_secondwon)
+
+df <- bind_rows(w_small, l_small) %>%
+  rename(player = "value")
+df
+
+var_choices <- names(df)[3:7]
+
+library(shiny)
+
+ui <- fluidPage(
+  sidebarLayout(
+    sidebarPanel(selectizeInput("playerchoice",
+                                label = "Choose a Player", 
+                                choices = levels(factor(df$player)),
+                                selected = "Aryna Sabalenka"),
+                 selectizeInput("playerchoice2",
+                                label = "Choose a Player", 
+                                choices = levels(factor(df$player)),
+                                selected = "Alex De Minaur"),
+                 radioButtons("varchoice", 
+                              label = "Choose a Statistic",
+                              choices = var_choices),
+                 radioButtons("meanchoice", label = "Display the Mean?", choices = c("YES", "NO"))),
+    mainPanel(plotOutput("histgraph"), plotOutput("sidebyside"))
+  )
+)
+
+server <- function(input, output, session) {
+  
+  df_sub <- reactive({
+    df %>% filter(player == input$playerchoice)
+  })
+  
+  
+  hist_plot <- reactive({
+    # ggplot(df_sub(), aes_string(x = input$varchoice)) +
+    # geom_histogram(colour = "black", fill = "white", bins = 15)
+    ggplot(df_sub(), aes(x = .data[[input$varchoice]])) +
+      geom_histogram(colour = "black", fill = "white", bins = 15)
+  })
+  
+  output$histgraph <- renderPlot({
+    hist_plot()
+  })
+  
+  df_sub2 <- reactive({
+    df %>% filter(player == input$playerchoice | player == input$playerchoice2)
+  })
+  
+  sidebyside_plot <- reactive({
+    # ggplot(df_sub(), aes_string(x = input$varchoice)) +
+    # geom_histogram(colour = "black", fill = "white", bins = 15)
+    ggplot(df_sub2(), aes(x = player, y = svperc)) +
+  geom_boxplot() 
+  })
+  
+  sidebyside_plot_mean <- reactive({
+    # ggplot(df_sub(), aes_string(x = input$varchoice)) +
+    # geom_histogram(colour = "black", fill = "white", bins = 15)
+    ggplot(df_sub2(), aes(x = player, y = svperc)) +
+  geom_boxplot() +
+  stat_summary(fun = mean, geom = "point", colour = "purple", shape = 8,
+               size = 3)
+  })
+  
+  output$sidebyside <- renderPlot({
+    if(input$meanchoice == "NO") {
+    sidebyside_plot()
+    }
+    else {
+      sidebyside_plot_mean()
+    }
+  })
+}
+
+shinyApp(ui, server)
+```
+
+test
+```{r}
+df_sub2 <- df %>% filter(player == "Aryna Sabalenka" | player == "Alex De Minaur")
+
+ggplot(df_sub2, aes(x = player, y = svperc)) +
+  geom_boxplot() +
+  stat_summary(fun = mean, geom = "point", colour = "purple", shape = 8,
+               size = 3)
+```
+
+
+Extra Credit (2 points). Add an input to your app that gives the user a choice for whether or not to display the means on the side-by-side boxplot (you must also modify the server so that the boxplots actually update if the user selects the means to be displayed). Below is code that plots the means on a static side-by-side boxplot.
+
+```{r}
+library(tidyverse)
+toy_df <- tibble(response = rnorm(100, 0, 1),
+                 group = sample(c("A", "B"), size = 100, replace = TRUE))
+ggplot(toy_df, aes(x = group, y = response)) +
+  geom_boxplot() +
+  stat_summary(fun = mean, geom = "point", colour = "purple", shape = 8,
+               size = 3)
+```
+
+
+-----------------------------------------------------
+
+10 Reactivity and Other Topics in shiny
+
+
+----------------------------------------------------
+
