@@ -1,0 +1,15 @@
+10.25 Update
+
+I created a project proposal which outlines what I want my project to be. I created the project shiny app. I created my list of questions thus far. 
+
+Project Proposal:
+Create shiny app for my interaction of mental health and positionality in literature project. The user should start with a title page which more goes through the overview of the project and the research. Then, I want there to be three different user interfaces depending on what version of positionality the user wishes to look at (author, protagonist, race alone or gender alone). Then on the chosen interface the user can create various visualizations. 
+
+I have two ideas for the purpose of this app. First, this can help me explore the data and filter through the various visualizations and try to find patterns. 
+But then I also want it to go with my published paper in terms of being able to convey my findings, so perhaps I can give hints of "try this combination" and have an analysis / findings from that visual.
+
+Questions:
+Can I create a shiny app where it draws from multiple different .rmd files? Because each positionality combination is on its own file. 
+
+(10.28 Update to do)
+write the list of all the visuals I want included in the app.
