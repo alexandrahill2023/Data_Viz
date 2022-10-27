@@ -2,8 +2,12 @@ Running shiny app
 ```{r}
 library(shiny)
 
-ui <- fluidPage(
-  
+ui <- navbarPage("The Interaction of Mental Health and Positionality in Literature",
+  tabPanel("Project Overview"),
+  tabPanel("Positionality of Author"),
+  tabPanel("Positionality of Protagonist"),
+  tabPanel("Race"),
+  tabPanel("Gender")
 )
 
 server <- function(input, output, session) {

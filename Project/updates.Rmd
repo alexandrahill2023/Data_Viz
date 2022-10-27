@@ -37,3 +37,8 @@ Long Term To Do List:
 - Create new visuals.
 - Figure out shiny app implementation.
 - Figure out Topic Modeling stuff.
+
+To Decide: Maybe eliminate on of the positionality by author or protag, depending where we see results. Thus making gender align with that decision. Orrr make gender only include novels where gender of author = gender of protag.
+
+Questions:
+I used navbarPage, but I'm not sure how this can integrate with the usual shinyapp structure we learned.
