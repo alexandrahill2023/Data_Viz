@@ -9,7 +9,31 @@ I have two ideas for the purpose of this app. First, this can help me explore th
 But then I also want it to go with my published paper in terms of being able to convey my findings, so perhaps I can give hints of "try this combination" and have an analysis / findings from that visual.
 
 Questions:
-Can I create a shiny app where it draws from multiple different .rmd files? Because each positionality combination is on its own file. 
+Can I create a shiny app where it draws from multiple different .rmd files? Because each positionality combination is on its own file. Or should I just transfer the various code into the singular shiny app file?
 
-(10.28 Update to do)
-write the list of all the visuals I want included in the app.
+10.28 Update
+
+Basic visuals I want included in the app: 
+(There will be a primary visual showing the measurement for each positionality. Underneath, I want a comparison visual for the mental health novels and parallel novels; I will gather YA novels, one by the same author for each novel in my mh group). So user chooses how they want to define positionality. Then chooses which of the following measurements they want to visualize. (if having choice of all visuals is too overwhelming, I could break into catergory; ie text analysis, sentiment analysis, mh-specific analysis, topic modeling) 
+- Top 10 most common words used per positionality bargraph
+- Single sent percentage based of words per book, swarm plot w/ mean
+- Nrc emotion percentages -> maybe with heat map instead of faceted?
+- Percentage of MH terms out of total words in novel, swarm plot w/ mean
+- Frequency of Derog mh words out of all words, swarm plot w/ mean
+- Non derog / derog percentage ratio, swarm plot w/ mean
+- Sentiment +-10 around mh words, swarm plot w/ mean
+- Most common MH words
+- Sentiment Analysis Graph (could just have all novels or user chooses a novel to look at, but this visual doesn't tell us much, so idk if I want to include just to have this app as a collection of all that I have created to analyze mh portrayal, or scrap this method).
+
+Topic Modeling interactive app:
+Slider to choose number of topics. 
+Another slider to decide how many topics to display in the visualization (ie top 5 most relevent).
+- Top words per topic, one visual per positionality
+- intertopic distance map. So all novels divided into topics. Then do the gamma calculation to assign each book its top lets say 5 topics and then label topic with the positionalities associated w/ it. INTERACTIVE GRAPH? Make it so when you click a topic's bubble it selects that topic to create the visual next to it -- a bargraph with the top 30 terms associated with that topic (and gives 'percent of tokens' ie how prevalent that topic is).
+
+Long Term To Do List:
+- Collect non mh books and clean. 
+- Pretty up my current visuals (titles, labels, captions, etc).
+- Create new visuals.
+- Figure out shiny app implementation.
+- Figure out Topic Modeling stuff.
