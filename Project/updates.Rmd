@@ -42,3 +42,17 @@ To Decide: Maybe eliminate on of the positionality by author or protag, dependin
 
 Questions:
 I used navbarPage, but I'm not sure how this can integrate with the usual shinyapp structure we learned.
+
+11.1 Update
+
+Only have project overview, positionality of author, p of protag. Then within 2 options, can choose an option that'll make it just race or just gender.
+
+No more non-mh books. Too many confounding factors. I tried w/ books by the same author, but found that even tho the main topic wasn't mh, there was mh present. It is an author topic of interest. But not same author would change genre and other factors too much.
+
+11.4 Update
+
+In Progress:
+- Pretty up my current visuals (titles, labels, captions, etc).
+- Create new visuals.
+- Figure out shiny app implementation.
+- Figure out Topic Modeling stuff.

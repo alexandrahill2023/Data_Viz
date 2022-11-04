@@ -5,9 +5,7 @@ library(shiny)
 ui <- navbarPage("The Interaction of Mental Health and Positionality in Literature",
   tabPanel("Project Overview"),
   tabPanel("Positionality of Author"),
-  tabPanel("Positionality of Protagonist"),
-  tabPanel("Race"),
-  tabPanel("Gender")
+  tabPanel("Positionality of Protagonist")
 )
 
 server <- function(input, output, session) {
