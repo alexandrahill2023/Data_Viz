@@ -1,0 +1,392 @@
+library 
+```{r}
+library(readtext) #Needed for readtext
+library(tidyverse)
+library(tm) #clean
+library(tidytext) #unnest
+library(textstem) #lemmatize
+```
+
+BY AUTHOR POSITIONALITY
+```{r}
+#white male 
+#read
+wm_df <- readtext("data/white_male_auth", cache=FALSE)
+#remove .txt
+wm_df$doc_id<-gsub(".txt", "", paste(wm_df$doc_id))
+#still nested for +-10
+wm_nest <- wm_df %>%
+  mutate(text = str_to_lower(text)) %>% 
+  mutate(positionality = "white male") %>%
+  mutate(text = str_squish(text)) %>%
+  mutate(text = removeNumbers(text))
+#unnest
+wm_unnest <- wm_nest %>% 
+  unnest_tokens(output = "word", input = "text")
+#remove stop words and punctuation
+wm <- anti_join(wm_unnest, stop_words, by = c("word" = "word"), .keep_all = true)
+wm <- wm %>% mutate(word = removePunctuation(word))
+#lemmatization
+wm_lem <- wm$word %>% lemmatize_words()
+wm_lem <- as.data.frame(wm_lem) 
+wm_lem <- wm_lem %>%
+  mutate(id = row_number()) 
+wm_lem_count <- wm %>% mutate(id = row_number())
+wm <- full_join(wm_lem, wm_lem_count, by = c("id" = "id"))
+wm <- wm %>% select(-id) %>% rename(lem = "wm_lem")
+
+#white female 
+#read
+wf_df <- readtext("data/white_fem_auth", cache=FALSE)
+#remove .txt
+wf_df$doc_id<-gsub(".txt", "", paste(wf_df$doc_id))
+#still nested for +-10
+wf_nest <- wf_df %>%
+  mutate(text = str_to_lower(text)) %>% 
+  mutate(positionality = "white fem") %>%
+  mutate(text = str_squish(text)) %>%
+  mutate(text = removeNumbers(text))
+#unnest
+wf_unnest <- wf_nest %>% 
+  unnest_tokens(output = "word", input = "text")
+#remove stop words
+wf <- anti_join(wf_unnest, stop_words, by = c("word" = "word"), .keep_all = true)
+wf <- wf %>% mutate(word = removePunctuation(word))
+#lemmatization
+wf_lem <- wf$word %>% lemmatize_words()
+wf_lem <- as.data.frame(wf_lem) 
+wf_lem <- wf_lem %>%
+  mutate(id = row_number()) 
+wf_lem_count <- wf %>% mutate(id = row_number())
+wf <- full_join(wf_lem, wf_lem_count, by = c("id" = "id"))
+wf <- wf %>% select(-id) %>% rename(lem = "wf_lem")
+
+#black female 
+#read
+bf_df <- readtext("data/black_fem_auth", cache=FALSE)
+#remove .txt
+bf_df$doc_id<-gsub(".txt", "", paste(bf_df$doc_id))
+#still nested for +-10
+bf_nest <- bf_df %>%
+  mutate(text = str_to_lower(text)) %>% 
+  mutate(positionality = "black fem") %>%
+  mutate(text = str_squish(text)) %>%
+  mutate(text = removeNumbers(text))
+#unnest
+bf_unnest <- bf_nest %>% 
+  unnest_tokens(output = "word", input = "text")
+#remove stop words
+bf <- anti_join(bf_unnest, stop_words, by = c("word" = "word"), .keep_all = true)
+bf <- bf %>% mutate(word = removePunctuation(word))
+#lemmatization
+bf_lem <- bf$word %>% lemmatize_words()
+bf_lem <- as.data.frame(bf_lem) 
+bf_lem <- bf_lem %>%
+  mutate(id = row_number()) 
+bf_lem_count <- bf %>% mutate(id = row_number())
+bf <- full_join(bf_lem, bf_lem_count, by = c("id" = "id"))
+bf <- bf %>% select(-id) %>% rename(lem = "bf_lem")
+
+#remove unneeded
+rm(wm_df, wm_lem_count, wf_df, wf_lem_count, bf_df, bf_lem_count, wm_nest, wf_nest, bf_nest)
+
+
+
+write.csv(wm_unnest, "data/wm_unnest_auth")
+write.csv(wf_unnest, "data/wf_unnest_auth")
+write.csv(bf_unnest, "data/bf_unnest_auth")
+write.csv(wm, "data/wm_auth")
+write.csv(wf, "data/wf_auth")
+write.csv(bf, "data/bf_auth")
+```
+
+BY PROTAG POSITIONALITY
+```{r}
+#white male 
+#read
+wm_df <- readtext("data/white_male_char", cache=FALSE)
+#remove .txt
+wm_df$doc_id<-gsub(".txt", "", paste(wm_df$doc_id))
+#still nested for +-10
+wm_nest <- wm_df %>%
+  mutate(text = str_to_lower(text)) %>% 
+  mutate(positionality = "white male") %>%
+  mutate(text = str_squish(text)) %>%
+  mutate(text = removeNumbers(text))
+#unnest
+wm_unnest <- wm_nest %>% 
+  unnest_tokens(output = "word", input = "text")
+#remove stop words and punctuation
+wm <- anti_join(wm_unnest, stop_words, by = c("word" = "word"), .keep_all = true)
+wm <- wm %>% mutate(word = removePunctuation(word))
+#lemmatization
+wm_lem <- wm$word %>% lemmatize_words()
+wm_lem <- as.data.frame(wm_lem) 
+wm_lem <- wm_lem %>%
+  mutate(id = row_number()) 
+wm_lem_count <- wm %>% mutate(id = row_number())
+wm <- full_join(wm_lem, wm_lem_count, by = c("id" = "id"))
+wm <- wm %>% select(-id) %>% rename(lem = "wm_lem")
+
+#white female 
+#read
+wf_df <- readtext("data/white_fem_char", cache=FALSE)
+#remove .txt
+wf_df$doc_id<-gsub(".txt", "", paste(wf_df$doc_id))
+#still nested for +-10
+wf_nest <- wf_df %>%
+  mutate(text = str_to_lower(text)) %>% 
+  mutate(positionality = "white fem") %>%
+  mutate(text = str_squish(text)) %>%
+  mutate(text = removeNumbers(text))
+#unnest
+wf_unnest <- wf_nest %>% 
+  unnest_tokens(output = "word", input = "text")
+#remove stop words
+wf <- anti_join(wf_unnest, stop_words, by = c("word" = "word"), .keep_all = true)
+wf <- wf %>% mutate(word = removePunctuation(word))
+#lemmatization
+wf_lem <- wf$word %>% lemmatize_words()
+wf_lem <- as.data.frame(wf_lem) 
+wf_lem <- wf_lem %>%
+  mutate(id = row_number()) 
+wf_lem_count <- wf %>% mutate(id = row_number())
+wf <- full_join(wf_lem, wf_lem_count, by = c("id" = "id"))
+wf <- wf %>% select(-id) %>% rename(lem = "wf_lem")
+
+#black female 
+#read
+bf_df <- readtext("data/black_fem_char", cache=FALSE)
+#remove .txt
+bf_df$doc_id<-gsub(".txt", "", paste(bf_df$doc_id))
+#still nested for +-10
+bf_nest <- bf_df %>%
+  mutate(text = str_to_lower(text)) %>% 
+  mutate(positionality = "black fem") %>%
+  mutate(text = str_squish(text)) %>%
+  mutate(text = removeNumbers(text))
+#unnest
+bf_unnest <- bf_nest %>% 
+  unnest_tokens(output = "word", input = "text")
+#remove stop words
+bf <- anti_join(bf_unnest, stop_words, by = c("word" = "word"), .keep_all = true)
+bf <- bf %>% mutate(word = removePunctuation(word))
+#lemmatization
+bf_lem <- bf$word %>% lemmatize_words()
+bf_lem <- as.data.frame(bf_lem) 
+bf_lem <- bf_lem %>%
+  mutate(id = row_number()) 
+bf_lem_count <- bf %>% mutate(id = row_number())
+bf <- full_join(bf_lem, bf_lem_count, by = c("id" = "id"))
+bf <- bf %>% select(-id) %>% rename(lem = "bf_lem")
+
+#remove unneeded
+rm(wm_df, wm_lem_count, wf_df, wf_lem_count, bf_df, bf_lem_count, wm_nest, wf_nest, bf_nest)
+
+
+write.csv(wm_unnest, "data/wm_unnest_char")
+write.csv(wf_unnest, "data/wf_unnest_char")
+write.csv(bf_unnest, "data/bf_unnest_char")
+write.csv(wm, "data/wm_char")
+write.csv(wf, "data/wf_char")
+write.csv(bf, "data/bf_char")
+```
+
+BY GENDER PROTOG
+```{r}
+#male 
+#read
+wm <- readtext("data/white_male_char", cache=FALSE)
+bm <- readtext("data/black_male_char", cache=FALSE)
+male <- bind_rows(wm, bm)
+#remove .txt
+male$doc_id<-gsub(".txt", "", paste(male$doc_id))
+#still nested for +-10
+male_nest <- male %>%
+  mutate(text = str_to_lower(text)) %>% 
+  mutate(positionality = "male") %>%
+  mutate(text = str_squish(text)) %>%
+  mutate(text = removeNumbers(text))
+#unnest
+male_unnest <- male_nest %>% 
+  unnest_tokens(output = "word", input = "text")
+#remove stop words and punctuation
+male <- anti_join(male_unnest, stop_words, by = c("word" = "word"), .keep_all = true)
+male <- male %>% mutate(word = removePunctuation(word))
+#lemmatization
+male_lem <- male$word %>% lemmatize_words()
+male_lem <- as.data.frame(male_lem) 
+male_lem <- male_lem %>%
+  mutate(id = row_number()) 
+male_lem_count <- male %>% mutate(id = row_number())
+male <- full_join(male_lem, male_lem_count, by = c("id" = "id"))
+male <- male %>% select(-id) %>% rename(lem = "male_lem")
+
+#female 
+wf <- readtext("data/white_fem_char", cache=FALSE)
+bf <- readtext("data/black_fem_char", cache=FALSE)
+fem <- bind_rows(wf, bf)
+#remove .txt
+fem$doc_id<-gsub(".txt", "", paste(fem$doc_id))
+#still nested for +-10
+fem_nest <- fem %>%
+  mutate(text = str_to_lower(text)) %>% 
+  mutate(positionality = "female") %>%
+  mutate(text = str_squish(text)) %>%
+  mutate(text = removeNumbers(text))
+#unnest
+fem_unnest <- fem_nest %>% 
+  unnest_tokens(output = "word", input = "text")
+#remove stop words and punctuation
+fem <- anti_join(fem_unnest, stop_words, by = c("word" = "word"), .keep_all = true)
+fem <- fem %>% mutate(word = removePunctuation(word))
+#lemmatization
+fem_lem <- fem$word %>% lemmatize_words()
+fem_lem <- as.data.frame(fem_lem) 
+fem_lem <- fem_lem %>%
+  mutate(id = row_number()) 
+fem_lem_count <- fem %>% mutate(id = row_number())
+fem <- full_join(fem_lem, fem_lem_count, by = c("id" = "id"))
+fem <- fem %>% select(-id) %>% rename(lem = "fem_lem")
+
+#remove unneeded
+rm(wm, male_lem_count, wf, fem_lem_count, bf, bm, male_nest, fem_nest)
+
+
+write.csv(fem_unnest, "data/fem_unnest_char_gender")
+write.csv(male_unnest, "data/male_unnest_char_gender")
+write.csv(fem, "data/fem_char_gender")
+write.csv(male, "data/male_char_gender")
+```
+
+BY GENDER AUTH
+```{r}
+#male 
+#read
+wm <- readtext("data/white_male_auth", cache=FALSE)
+bm <- readtext("data/black_male_auth", cache=FALSE)
+male <- bind_rows(wm, bm)
+#remove .txt
+male$doc_id<-gsub(".txt", "", paste(male$doc_id))
+#still nested for +-10
+male_nest <- male %>%
+  mutate(text = str_to_lower(text)) %>% 
+  mutate(positionality = "male") %>%
+  mutate(text = str_squish(text)) %>%
+  mutate(text = removeNumbers(text))
+#unnest
+male_unnest <- male_nest %>% 
+  unnest_tokens(output = "word", input = "text")
+#remove stop words and punctuation
+male <- anti_join(male_unnest, stop_words, by = c("word" = "word"), .keep_all = true)
+male <- male %>% mutate(word = removePunctuation(word))
+#lemmatization
+male_lem <- male$word %>% lemmatize_words()
+male_lem <- as.data.frame(male_lem) 
+male_lem <- male_lem %>%
+  mutate(id = row_number()) 
+male_lem_count <- male %>% mutate(id = row_number())
+male <- full_join(male_lem, male_lem_count, by = c("id" = "id"))
+male <- male %>% select(-id) %>% rename(lem = "male_lem")
+
+#female 
+wf <- readtext("data/white_fem_auth", cache=FALSE)
+bf <- readtext("data/black_fem_auth", cache=FALSE)
+fem <- bind_rows(wf, bf)
+#remove .txt
+fem$doc_id<-gsub(".txt", "", paste(fem$doc_id))
+#still nested for +-10
+fem_nest <- fem %>%
+  mutate(text = str_to_lower(text)) %>% 
+  mutate(positionality = "female") %>%
+  mutate(text = str_squish(text)) %>%
+  mutate(text = removeNumbers(text))
+#unnest
+fem_unnest <- fem_nest %>% 
+  unnest_tokens(output = "word", input = "text")
+#remove stop words and punctuation
+fem <- anti_join(fem_unnest, stop_words, by = c("word" = "word"), .keep_all = true)
+fem <- fem %>% mutate(word = removePunctuation(word))
+#lemmatization
+fem_lem <- fem$word %>% lemmatize_words()
+fem_lem <- as.data.frame(fem_lem) 
+fem_lem <- fem_lem %>%
+  mutate(id = row_number()) 
+fem_lem_count <- fem %>% mutate(id = row_number())
+fem <- full_join(fem_lem, fem_lem_count, by = c("id" = "id"))
+fem <- fem %>% select(-id) %>% rename(lem = "fem_lem")
+
+#remove unneeded
+rm(wm, male_lem_count, wf, fem_lem_count, bf, bm, fem_nest, male_nest)
+
+
+write.csv(fem_unnest, "data/fem_unnest_auth_gender")
+write.csv(male_unnest, "data/male_unnest_auth_gender")
+write.csv(fem, "data/fem_auth_gender")
+write.csv(male, "data/male_auth_gender")
+```
+
+RACE
+```{r}
+#white 
+#read
+w_df <- readtext("data/white", cache=FALSE)
+#remove .txt
+w_df$doc_id<-gsub(".txt", "", paste(w_df$doc_id))
+#still nested for +-10
+w_nest <- w_df %>%
+  mutate(text = str_to_lower(text)) %>% 
+  mutate(positionality = "white") %>%
+  mutate(text = str_squish(text)) %>%
+  mutate(text = removeNumbers(text))
+#unnest
+w_unnest <- w_nest %>% 
+  unnest_tokens(output = "word", input = "text")
+#remove stop words and punctuation
+w <- anti_join(w_unnest, stop_words, by = c("word" = "word"), .keep_all = true)
+w <- w %>% mutate(word = removePunctuation(word))
+#lemmatization
+w_lem <- w$word %>% lemmatize_words()
+w_lem <- as.data.frame(w_lem) 
+w_lem <- w_lem %>%
+  mutate(id = row_number()) 
+w_lem_count <- w %>% mutate(id = row_number())
+w <- full_join(w_lem, w_lem_count, by = c("id" = "id"))
+w <- w %>% select(-id) %>% rename(lem = "w_lem")
+
+#black  
+#read
+b_df <- readtext("data/black", cache=FALSE)
+#remove .txt
+b_df$doc_id<-gsub(".txt", "", paste(b_df$doc_id))
+#still nested for +-10
+b_nest <- b_df %>%
+  mutate(text = str_to_lower(text)) %>% 
+  mutate(positionality = "black") %>%
+  mutate(text = str_squish(text)) %>%
+  mutate(text = removeNumbers(text))
+#unnest
+b_unnest <- b_nest %>% 
+  unnest_tokens(output = "word", input = "text")
+#remove stop words
+b <- anti_join(b_unnest, stop_words, by = c("word" = "word"), .keep_all = true)
+b <- b %>% mutate(word = removePunctuation(word))
+#lemmatization
+b_lem <- b$word %>% lemmatize_words()
+b_lem <- as.data.frame(b_lem) 
+b_lem <- b_lem %>%
+  mutate(id = row_number()) 
+b_lem_count <- b %>% mutate(id = row_number())
+b <- full_join(b_lem, b_lem_count, by = c("id" = "id"))
+b <- b %>% select(-id) %>% rename(lem = "b_lem")
+
+#remove unneeded
+rm(w_df, w_lem_count, b_df, b_lem_count, b_nest, w_nest)
+
+
+write.csv(w_unnest, "data/w_unnest")
+write.csv(b_unnest, "data/b_unnest")
+write.csv(w, "data/w")
+write.csv(b, "data/b")
+```
+
