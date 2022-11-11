@@ -55,4 +55,19 @@ In Progress:
 - Pretty up my current visuals (titles, labels, captions, etc).
 - Create new visuals.
 - Figure out shiny app implementation.
+-> use tabset panel. get static visuals in app. do all data wrangling, write to csv file. then at top of shiny app import in
 - Figure out Topic Modeling stuff.
+
+11.8 Update
+
+I set up the layout of my app. I put in the inputs I will eventually be connecting and output placeholders. I created all the data, doing the text wrangling in one rmd, creating csvs, and then upload the csvs to the shiny file.
+
+Note when choosing race only that race of author always aligns with race of protag, so the two tabs should have completely paralleled content.
+
+idea: do lemmatization and full words versions.
+
+HELP!! GITHUB WONT LET ME UPLOAD DUE TO FILE SIZE?!
+
+11.11 Update
+
+Collected the static visuals. Figured out text output for overview.

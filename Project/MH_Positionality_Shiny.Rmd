@@ -1,15 +1,112 @@
+Libraries
+```{r}
+library(tidyverse)
+```
+
+Data
+```{r}
+# BY AUTHOR POSITIONALITY
+wm_unnest_auth <- read_csv("data/wm_unnest_auth")
+wf_unnest_auth <- read_csv("data/wf_unnest_auth")
+bf_unnest_auth <- read_csv("data/bf_unnest_auth")
+wm_auth <- read_csv("data/wm_auth")
+wf_auth <- read_csv("data/wf_auth")
+bf_auth <- read_csv("data/bf_auth")
+
+#all novels together
+all_novels_auth <- bind_rows(wm_auth, wf_auth, bf_auth)
+novel_list_auth <- list(wm_auth, wf_auth, bf_auth)
+novels_with_stop_list_auth <- list(wm_unnest_auth, wf_unnest_auth, bf_unnest_auth)
+
+# BY PROTAG POSITIONALITY
+wm_unnest_char <- read_csv("data/wm_unnest_char")
+wf_unnest_char <- read_csv("data/wf_unnest_char")
+bf_unnest_char <- read_csv("data/bf_unnest_char")
+wm_char <- read_csv("data/wm_char")
+wf_char <- read_csv("data/wf_char")
+bf_char <- read_csv("data/bf_char")
+
+#all novels together
+all_novels_char <- bind_rows(wm_char, wf_char, bf_char)
+novel_list_char <- list(wm_char, wf_char, bf_char)
+novels_with_stop_list_char <- list(wm_unnest_char, wf_unnest_char, bf_unnest_char)
+
+# BY GENDER PROTOG
+fem_unnest_char_gender <- read_csv("data/fem_unnest_char_gender")
+male_unnest_char_gender <- read_csv("data/male_unnest_char_gender")
+fem_char_gender <- read_csv("data/fem_char_gender")
+male_char_gender <- read_csv("data/male_char_gender")
+
+#all novels together
+all_novels_char_gender <- bind_rows(fem_char_gender, male_char_gender)
+novel_list_char_gender <- list(fem_char_gender, male_char_gender)
+novels_with_stop_list_char_gender <- list(fem_unnest_char_gender, male_unnest_char_gender)
+
+# BY GENDER AUTH
+fem_unnest_auth_gender <- read_csv("data/fem_unnest_auth_gender")
+male_unnest_auth_gender <- read_csv("data/male_unnest_auth_gender")
+fem_auth_gender <- read_csv("data/fem_auth_gender")
+male_auth_gender <- read_csv("data/male_auth_gender")
+
+#all novels together
+all_novels_auth_gender <- bind_rows(fem_auth_gender, male_auth_gender)
+novel_list_auth_gender <- list(fem_auth_gender, male_auth_gender)
+novels_with_stop_list_auth_gender <- list(fem_unnest_auth_gender, male_unnest_auth_gender)
+
+# RACE
+w_unnest <- read_csv("data/w_unnest")
+b_unnest <- read_csv("data/b_unnest")
+w <- read_csv("data/w")
+b <- read_csv("data/b")
+
+#all novels together
+all_novels_race <- bind_rows(w, b)
+novel_list_race <- list(w, b)
+novels_with_stop_list_race <- list(wm_unnest, wf_unnest, bf_unnest)
+```
+
+
 Running shiny app
 ```{r}
+
+
 library(shiny)
 
-ui <- navbarPage("The Interaction of Mental Health and Positionality in Literature",
-  tabPanel("Project Overview"),
-  tabPanel("Positionality of Author"),
-  tabPanel("Positionality of Protagonist")
+ui <- fluidPage(
+
+  titlePanel("The Interaction of Mental Health and Positionality in Literature"),
+
+  sidebarLayout(
+    
+    sidebarPanel(
+      # Inputs 
+      radioButtons("positionality_choice", label = "What aspects of positionality do you want to investigate?", choices = c("Gender and Race", "Race", "Gender")),
+      selectizeInput("viz_choice",
+                                label = "What would you like to visualize?", 
+                                choices = c("Stat1", "Stat2"),
+                                selected = "Stat1")
+    ),
+  
+    mainPanel(
+      tabsetPanel(
+        # tabs and reactive visuals
+        tabPanel("Project Overview", textOutput("overview")),
+        tabPanel("Positionality of Author", plotOutput("plot"), tableOutput("table")), 
+        tabPanel("Positionality of Protagonist", verbatimTextOutput("summary")),
+        tabPanel("Sentiment Analysis of Each Novel", textOutput(" "))
+        
+      )
+    )
+  )
 )
+  
 
 server <- function(input, output, session) {
-  
+  # outputs
+  output$overview <- renderText({ 
+    #paste in someone's example who has done this,, HTML code h1(theme)
+    "This is a project about --" 
+  })
 }
 
 shinyApp(ui, server)

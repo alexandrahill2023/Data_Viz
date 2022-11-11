@@ -212,7 +212,6 @@ tennis_order <- tennis_final %>%
 ggplot(data = tennis_order, aes(x = order, y = mean_aces)) +
   geom_point() + 
   geom_segment(aes(x = player, xend = player, y = 0, yend = mean_aces)) 
-  )
 ```
 
 Question 8 (20 points).
