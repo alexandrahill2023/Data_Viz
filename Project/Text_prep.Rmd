@@ -91,6 +91,9 @@ bf <- bf %>% select(-id) %>% rename(lem = "bf_lem")
 rm(wm_df, wm_lem_count, wf_df, wf_lem_count, bf_df, bf_lem_count, wm_nest, wf_nest, bf_nest)
 
 
+#auth certain type of viz
+
+
 
 write.csv(wm_unnest, "data/wm_unnest_auth")
 write.csv(wf_unnest, "data/wf_unnest_auth")

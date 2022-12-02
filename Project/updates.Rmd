@@ -89,3 +89,4 @@ Inputting all stat visualization choices and positionality choices.
 12.1 Update
 
 Can't figure out the Error in : Can't use NA as column index with `[` at positions 1, 2, 3, 4, 5, and 1 more.
+Going to make variable for positionality choice. and dfs for what to be used in ggplot, which i put directly in cuz cant make reactive graph
