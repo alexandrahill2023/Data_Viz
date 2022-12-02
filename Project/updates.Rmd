@@ -71,3 +71,21 @@ HELP!! GITHUB WONT LET ME UPLOAD DUE TO FILE SIZE?!
 11.11 Update
 
 Collected the static visuals. Figured out text output for overview.
+
+11.15 Update
+
+QUESTION: Can't figure out HTML stuff 
+
+Added in the static visuals
+
+11.18 Update
+
+Setting up first reactive, one sent score per novel, to ensure i can successfully convert to shiny app.
+
+11.30 Update
+
+Inputting all stat visualization choices and positionality choices.
+
+12.1 Update
+
+Can't figure out the Error in : Can't use NA as column index with `[` at positions 1, 2, 3, 4, 5, and 1 more.
