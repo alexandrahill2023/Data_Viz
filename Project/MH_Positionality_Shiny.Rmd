@@ -16,11 +16,7 @@ wf_auth <- read_csv("data/wf_auth")%>% select(!1)
 bf_auth <- read_csv("data/bf_auth")%>% select(!1)
 
 #all novels together
-all_novels_auth <- bind_rows(wm_auth, wf_auth, bf_auth) %>%
-  group_by(doc_id) %>%
-  mutate(id = row_number()) %>%
-  mutate(tot_words = n()) %>%
-  ungroup() 
+
 novel_list_auth <- list(wm_auth, wf_auth, bf_auth)
 novels_with_stop_list_auth <- list(wm_unnest_auth, wf_unnest_auth, bf_unnest_auth)
 
@@ -33,11 +29,7 @@ wf_char <- read_csv("data/wf_char")%>% select(!1)
 bf_char <- read_csv("data/bf_char")%>% select(!1)
 
 #all novels together
-all_novels_char <- bind_rows(wm_char, wf_char, bf_char) %>%
-  group_by(doc_id) %>%
-  mutate(id = row_number()) %>%
-  mutate(tot_words = n()) %>%
-  ungroup() 
+
 novel_list_char <- list(wm_char, wf_char, bf_char)
 novels_with_stop_list_char <- list(wm_unnest_char, wf_unnest_char, bf_unnest_char)
 
@@ -48,11 +40,7 @@ fem_char_gender <- read_csv("data/fem_char_gender")
 male_char_gender <- read_csv("data/male_char_gender")
 
 #all novels together
-all_novels_char_gender <- bind_rows(fem_char_gender, male_char_gender) %>%
-  group_by(doc_id) %>%
-  mutate(id = row_number()) %>%
-  mutate(tot_words = n()) %>%
-  ungroup() 
+
 novel_list_char_gender <- list(fem_char_gender, male_char_gender)
 novels_with_stop_list_char_gender <- list(fem_unnest_char_gender, male_unnest_char_gender)
 
@@ -63,11 +51,7 @@ fem_auth_gender <- read_csv("data/fem_auth_gender")%>% select(!1)
 male_auth_gender <- read_csv("data/male_auth_gender")%>% select(!1)
 
 #all novels together
-all_novels_auth_gender <- bind_rows(fem_auth_gender, male_auth_gender) %>%
-  group_by(doc_id) %>%
-  mutate(id = row_number()) %>%
-  mutate(tot_words = n()) %>%
-  ungroup() 
+
 novel_list_auth_gender <- list(fem_auth_gender, male_auth_gender)
 novels_with_stop_list_auth_gender <- list(fem_unnest_auth_gender, male_unnest_auth_gender)
 
@@ -78,13 +62,14 @@ w <- read_csv("data/w")%>% select(!1)
 b <- read_csv("data/b")%>% select(!1)
 
 #all novels together
-all_novels_race <- bind_rows(w, b) %>%
-  group_by(doc_id) %>%
-  mutate(id = row_number()) %>%
-  mutate(tot_words = n()) %>%
-  ungroup() 
+
 novel_list_race <- list(w, b) 
 novels_with_stop_list_race <- list(wm_unnest, wf_unnest, bf_unnest)
+```
+
+DFs
+```{r}
+sent_per <- read_csv("data/sent_per")
 ```
 
 
@@ -183,100 +168,11 @@ server <- function(input, output, session) {
   
      
 #SENT PER NOVEL AUTH
-     #afinn
-afinn_auth <-  reactive({
-  case_when(input$positionality_choice == "Gender and Race" ~ 
-    all_novels_auth %>% 
-   inner_join(get_sentiments("afinn")) %>% 
-   group_by(doc_id, positionality, tot_words) %>% 
-   summarise(sentiment = sum(value)) %>% 
-  mutate(perc = sentiment/tot_words) %>%
-   mutate(method = "AFINN") ,
-             input$positionality_choice == "Race" ~ 
-    all_novels_race %>% 
-   inner_join(get_sentiments("afinn")) %>% 
-   group_by(doc_id, positionality, tot_words) %>% 
-   summarise(sentiment = sum(value)) %>% 
-  mutate(perc = sentiment/tot_words) %>%
-   mutate(method = "AFINN"),
-               input$positionality_choice == "Gender" ~ 
-  all_novels_auth_gender %>% 
-   inner_join(get_sentiments("afinn")) %>% 
-   group_by(doc_id, positionality, tot_words) %>% 
-   summarise(sentiment = sum(value)) %>% 
-  mutate(perc = sentiment/tot_words) %>%
-   mutate(method = "AFINN")
-  )
+sent_per_input_auth <- reactive({
+    sent_per %>% filter(positionality_choice == input$positionality_choice) %>%
+    filter(choice == "auth")
   })
-
-
-   #bing and nrc
-bing_and_nrc_auth <- reactive({
-   case_when(input$positionality_choice == "Gender and Race" ~  
-  bind_rows(
-  all_novels_auth %>% 
-    inner_join(get_sentiments("bing")) %>%
-    mutate(method = "Bing et al."),
-  all_novels_auth %>% 
-    inner_join(get_sentiments("nrc") %>% 
-                 filter(sentiment %in% c("positive", 
-                                         "negative"))
-    ) %>%
-    mutate(method = "NRC")) %>%
-  count(method, doc_id, sentiment, positionality, tot_words) %>%
-  spread(sentiment, n, fill = 0) %>%
-  mutate(sentiment = positive - negative) %>%
-  mutate(perc = sentiment / tot_words),
-             input$positionality_choice == "Race" ~ 
-                bind_rows(
-  all_novels_race %>% 
-    inner_join(get_sentiments("bing")) %>%
-    mutate(method = "Bing et al."),
-  all_novels_race %>% 
-    inner_join(get_sentiments("nrc") %>% 
-                 filter(sentiment %in% c("positive", 
-                                         "negative"))
-    ) %>%
-    mutate(method = "NRC")) %>%
-  count(method, doc_id, sentiment, positionality, tot_words) %>%
-  spread(sentiment, n, fill = 0) %>%
-  mutate(sentiment = positive - negative) %>%
-  mutate(perc = sentiment / tot_words),
-             input$positionality_choice == "Gender" ~ 
-                bind_rows(
-  all_novels_auth_gender %>% 
-    inner_join(get_sentiments("bing")) %>%
-    mutate(method = "Bing et al."),
-  all_novels_auth_gender %>% 
-    inner_join(get_sentiments("nrc") %>% 
-                 filter(sentiment %in% c("positive", 
-                                         "negative"))
-    ) %>%
-    mutate(method = "NRC")) %>%
-  count(method, doc_id, sentiment, positionality, tot_words) %>%
-  spread(sentiment, n, fill = 0) %>%
-  mutate(sentiment = positive - negative) %>%
-  mutate(perc = sentiment / tot_words)
-   )
-  })
-
-  #Swarm plot
-one_sent_per_auth <- reactive({
-  ggplot(data = bind_rows(afinn_auth(), bing_and_nrc_auth()),
-       aes(x = positionality, y = perc, color = positionality)) +
-  geom_beeswarm(cex = 3) +
-  facet_wrap(~ method) +
-  theme(legend.position = "none") +
-   scale_colour_brewer(palette = "Accent") +
-  stat_summary(
-    geom = "point",
-    fun = "mean",
-    col = "black",
-    size = 1,
-    shape = 24,
-    fill = "black"
-  )
-})
+  
 
  #NRC emotion percentages auth
 # nrc_auth <- reactive({
@@ -340,100 +236,7 @@ one_sent_per_auth <- reactive({
 
 #sent per char
 
- #afinn - make afin auth df and 3 variables 
-afinn_auth <-  reactive({
-  case_when(input$positionality_choice == "Gender and Race" ~ 
-    all_novels_auth %>% 
-   inner_join(get_sentiments("afinn")) %>% 
-   group_by(doc_id, positionality, tot_words) %>% 
-   summarise(sentiment = sum(value)) %>% 
-  mutate(perc = sentiment/tot_words) %>%
-   mutate(method = "AFINN") ,
-             input$positionality_choice == "Race" ~ 
-    all_novels_race %>% 
-   inner_join(get_sentiments("afinn")) %>% 
-   group_by(doc_id, positionality, tot_words) %>% 
-   summarise(sentiment = sum(value)) %>% 
-  mutate(perc = sentiment/tot_words) %>%
-   mutate(method = "AFINN"),
-               input$positionality_choice == "Gender" ~ 
-  all_novels_auth_gender %>% 
-   inner_join(get_sentiments("afinn")) %>% 
-   group_by(doc_id, positionality, tot_words) %>% 
-   summarise(sentiment = sum(value)) %>% 
-  mutate(perc = sentiment/tot_words) %>%
-   mutate(method = "AFINN")
-  )
-  })
-
-
-   #bing and nrc char
-bing_and_nrc_auth <- reactive({
-   case_when(input$positionality_choice == "Gender and Race" ~  
-  bind_rows(
-  all_novels_auth %>% 
-    inner_join(get_sentiments("bing")) %>%
-    mutate(method = "Bing et al."),
-  all_novels_auth %>% 
-    inner_join(get_sentiments("nrc") %>% 
-                 filter(sentiment %in% c("positive", 
-                                         "negative"))
-    ) %>%
-    mutate(method = "NRC")) %>%
-  count(method, doc_id, sentiment, positionality, tot_words) %>%
-  spread(sentiment, n, fill = 0) %>%
-  mutate(sentiment = positive - negative) %>%
-  mutate(perc = sentiment / tot_words),
-             input$positionality_choice == "Race" ~ 
-                bind_rows(
-  all_novels_race %>% 
-    inner_join(get_sentiments("bing")) %>%
-    mutate(method = "Bing et al."),
-  all_novels_race %>% 
-    inner_join(get_sentiments("nrc") %>% 
-                 filter(sentiment %in% c("positive", 
-                                         "negative"))
-    ) %>%
-    mutate(method = "NRC")) %>%
-  count(method, doc_id, sentiment, positionality, tot_words) %>%
-  spread(sentiment, n, fill = 0) %>%
-  mutate(sentiment = positive - negative) %>%
-  mutate(perc = sentiment / tot_words),
-             input$positionality_choice == "Gender" ~ 
-                bind_rows(
-  all_novels_auth_gender %>% 
-    inner_join(get_sentiments("bing")) %>%
-    mutate(method = "Bing et al."),
-  all_novels_auth_gender %>% 
-    inner_join(get_sentiments("nrc") %>% 
-                 filter(sentiment %in% c("positive", 
-                                         "negative"))
-    ) %>%
-    mutate(method = "NRC")) %>%
-  count(method, doc_id, sentiment, positionality, tot_words) %>%
-  spread(sentiment, n, fill = 0) %>%
-  mutate(sentiment = positive - negative) %>%
-  mutate(perc = sentiment / tot_words)
-   )
-  })
-
-  #Swarm plot
-one_sent_per_auth <- reactive({
-  ggplot(data = bind_rows(afinn_auth(), bing_and_nrc_auth()),
-       aes(x = positionality, y = perc, color = positionality)) +
-  geom_beeswarm(cex = 3) +
-  facet_wrap(~ method) +
-  theme(legend.position = "none") +
-   scale_colour_brewer(palette = "Accent") +
-  stat_summary(
-    geom = "point",
-    fun = "mean",
-    col = "black",
-    size = 1,
-    shape = 24,
-    fill = "black"
-  )
-})
+ 
 
 #NRC emotion percentages char
 # nrc_char <- reactive({
@@ -492,9 +295,35 @@ one_sent_per_auth <- reactive({
   # Use a reactive expression by calling it like a function
 #AUTHOR
   output$plot_1 <- renderPlot({
-     case_when(#input$viz_choice == "Most common words used" ~ top_10_words_auth(),
-               input$viz_choice == "Sentiment score per novel" ~ one_sent_per_auth(),
-               input$viz_choice == "NRC emotion percentages" ~ nrc_auth(),
+     case_when(input$viz_choice == "Most common words used" ~ ggplot(data = sent_per_input_auth(),
+       aes(x = positionality, y = perc, color = positionality)) +
+  geom_beeswarm(cex = 3) +
+  facet_wrap(~ method) +
+  theme(legend.position = "none") +
+   scale_colour_brewer(palette = "Accent") +
+  stat_summary(
+    geom = "point",
+    fun = "mean",
+    col = "black",
+    size = 1,
+    shape = 24,
+    fill = "black"
+  ),
+               input$viz_choice == "Sentiment score per novel" ~ ggplot(data = sent_per_input_auth(),
+       aes(x = positionality, y = perc, color = positionality)) +
+  geom_beeswarm(cex = 3) +
+  facet_wrap(~ method) +
+  theme(legend.position = "none") +
+   scale_colour_brewer(palette = "Accent") +
+  stat_summary(
+    geom = "point",
+    fun = "mean",
+    col = "black",
+    size = 1,
+    shape = 24,
+    fill = "black"
+  )#,
+             #  input$viz_choice == "NRC emotion percentages" ~ nrc_auth(),
                #input$viz_choice == "Most common mental health words" ~ most_common_mh_auth(),
                #input$viz_choice == "Frequency of mental health terms in novel" ~ freq_mh_auth(),
                #input$viz_choice == "Ratio of derogatory to non-derogatory words" ~ ratio_derog_auth(),
@@ -502,18 +331,18 @@ one_sent_per_auth <- reactive({
      )
   })
 #CHARACTER
-  output$plot_2 <- renderPlot({
-     case_when(#input$viz_choice == "Most common words used" ~ top_10_char(),
-               input$viz_choice == "Sentiment score per novel" ~ one_sent_per_char(),
-               input$viz_choice == "NRC emotion percentages" ~ nrc_char(),
-               # input$viz_choice == "Most common mental health words" ~ most_common_mh_char(),
-               # input$viz_choice == "Frequency of mental health terms in novel" ~ freq_mh_char(),
-               # input$viz_choice == "Ratio of derogatory to non-derogatory words" ~ ratio_derog_char(),
-               # input$viz_choice == "Sentiment +-10 words around mental health words" ~ around_mh_char()
-     )
-  })
-  
-}
+#   output$plot_2 <- renderPlot({
+#      case_when(#input$viz_choice == "Most common words used" ~ top_10_char(),
+#                #input$viz_choice == "Sentiment score per novel" ~ ,
+#                #input$viz_choice == "NRC emotion percentages" ~ nrc_char(),
+#                # input$viz_choice == "Most common mental health words" ~ most_common_mh_char(),
+#                # input$viz_choice == "Frequency of mental health terms in novel" ~ freq_mh_char(),
+#                # input$viz_choice == "Ratio of derogatory to non-derogatory words" ~ ratio_derog_char(),
+#                # input$viz_choice == "Sentiment +-10 words around mental health words" ~ around_mh_char()
+#      )
+#   })
+#   
+ }
 
 shinyApp(ui, server)
 

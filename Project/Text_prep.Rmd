@@ -91,10 +91,6 @@ bf <- bf %>% select(-id) %>% rename(lem = "bf_lem")
 rm(wm_df, wm_lem_count, wf_df, wf_lem_count, bf_df, bf_lem_count, wm_nest, wf_nest, bf_nest)
 
 
-#auth certain type of viz
-
-
-
 write.csv(wm_unnest, "data/wm_unnest_auth")
 write.csv(wf_unnest, "data/wf_unnest_auth")
 write.csv(bf_unnest, "data/bf_unnest_auth")
@@ -223,7 +219,7 @@ male_lem <- male_lem %>%
   mutate(id = row_number()) 
 male_lem_count <- male %>% mutate(id = row_number())
 male <- full_join(male_lem, male_lem_count, by = c("id" = "id"))
-male <- male %>% select(-id) %>% rename(lem = "male_lem")
+male_char_gender <- male %>% select(-id) %>% rename(lem = "male_lem")
 
 #female 
 wf <- readtext("data/white_fem_char", cache=FALSE)
@@ -250,7 +246,7 @@ fem_lem <- fem_lem %>%
   mutate(id = row_number()) 
 fem_lem_count <- fem %>% mutate(id = row_number())
 fem <- full_join(fem_lem, fem_lem_count, by = c("id" = "id"))
-fem <- fem %>% select(-id) %>% rename(lem = "fem_lem")
+fem_char_gender <- fem %>% select(-id) %>% rename(lem = "fem_lem")
 
 #remove unneeded
 rm(wm, male_lem_count, wf, fem_lem_count, bf, bm, male_nest, fem_nest)
@@ -258,8 +254,8 @@ rm(wm, male_lem_count, wf, fem_lem_count, bf, bm, male_nest, fem_nest)
 
 write.csv(fem_unnest, "data/fem_unnest_char_gender")
 write.csv(male_unnest, "data/male_unnest_char_gender")
-write.csv(fem, "data/fem_char_gender")
-write.csv(male, "data/male_char_gender")
+write.csv(fem_char_gender, "data/fem_char_gender")
+write.csv(male_char_gender, "data/male_char_gender")
 ```
 
 BY GENDER AUTH
@@ -290,7 +286,7 @@ male_lem <- male_lem %>%
   mutate(id = row_number()) 
 male_lem_count <- male %>% mutate(id = row_number())
 male <- full_join(male_lem, male_lem_count, by = c("id" = "id"))
-male <- male %>% select(-id) %>% rename(lem = "male_lem")
+male_auth_gender <- male %>% select(-id) %>% rename(lem = "male_lem")
 
 #female 
 wf <- readtext("data/white_fem_auth", cache=FALSE)
@@ -317,7 +313,7 @@ fem_lem <- fem_lem %>%
   mutate(id = row_number()) 
 fem_lem_count <- fem %>% mutate(id = row_number())
 fem <- full_join(fem_lem, fem_lem_count, by = c("id" = "id"))
-fem <- fem %>% select(-id) %>% rename(lem = "fem_lem")
+fem_auth_gender <- fem %>% select(-id) %>% rename(lem = "fem_lem")
 
 #remove unneeded
 rm(wm, male_lem_count, wf, fem_lem_count, bf, bm, fem_nest, male_nest)
@@ -325,8 +321,8 @@ rm(wm, male_lem_count, wf, fem_lem_count, bf, bm, fem_nest, male_nest)
 
 write.csv(fem_unnest, "data/fem_unnest_auth_gender")
 write.csv(male_unnest, "data/male_unnest_auth_gender")
-write.csv(fem, "data/fem_auth_gender")
-write.csv(male, "data/male_auth_gender")
+write.csv(fem_auth_gender, "data/fem_auth_gender")
+write.csv(male_auth_gender, "data/male_auth_gender")
 ```
 
 RACE
@@ -391,5 +387,224 @@ write.csv(w_unnest, "data/w_unnest")
 write.csv(b_unnest, "data/b_unnest")
 write.csv(w, "data/w")
 write.csv(b, "data/b")
+```
+
+
+
+DFs
+```{r}
+#all novels
+all_novels_auth <- bind_rows(wm_auth, wf_auth, bf_auth) %>%
+  group_by(doc_id) %>%
+  mutate(id = row_number()) %>%
+  mutate(tot_words = n()) %>%
+  ungroup() 
+
+all_novels_auth_gender <- bind_rows(fem_auth_gender, male_auth_gender) %>%
+  group_by(doc_id) %>%
+  mutate(id = row_number()) %>%
+  mutate(tot_words = n()) %>%
+  ungroup() 
+
+
+all_novels_race <- bind_rows(w, b) %>%
+  group_by(doc_id) %>%
+  mutate(id = row_number()) %>%
+  mutate(tot_words = n()) %>%
+  ungroup() 
+
+
+all_novels_char <- bind_rows(wm_char, wf_char, bf_char) %>%
+  group_by(doc_id) %>%
+  mutate(id = row_number()) %>%
+  mutate(tot_words = n()) %>%
+  ungroup() 
+
+all_novels_char_gender <- bind_rows(fem_char_gender, male_char_gender) %>%
+  group_by(doc_id) %>%
+  mutate(id = row_number()) %>%
+  mutate(tot_words = n()) %>%
+  ungroup() 
+
+#VISUALIZATIONS !!!
+
+#Most common words used
+
+
+#Sentiment score per novel
+auth_afinn <-
+    all_novels_auth %>% 
+   inner_join(get_sentiments("afinn")) %>% 
+   group_by(doc_id, positionality, tot_words) %>% 
+   summarise(sentiment = sum(value)) %>% 
+  mutate(perc = sentiment/tot_words) %>%
+   mutate(method = "AFINN") %>%
+  mutate(positionality_choice = "Gender and Race")
+
+
+race_afinn <- 
+    all_novels_race %>% 
+   inner_join(get_sentiments("afinn")) %>% 
+   group_by(doc_id, positionality, tot_words) %>% 
+   summarise(sentiment = sum(value)) %>% 
+  mutate(perc = sentiment/tot_words) %>%
+   mutate(method = "AFINN") %>%
+  mutate(positionality_choice = "Race")
+
+
+auth_gender_afinn <-
+  all_novels_auth_gender %>% 
+   inner_join(get_sentiments("afinn")) %>% 
+   group_by(doc_id, positionality, tot_words) %>% 
+   summarise(sentiment = sum(value)) %>% 
+  mutate(perc = sentiment/tot_words) %>%
+   mutate(method = "AFINN") %>%
+  mutate(positionality_choice = "Gender")
+
+
+   #bing and nrc
+bing_and_nrc_auth <- 
+  bind_rows(
+  all_novels_auth %>% 
+    inner_join(get_sentiments("bing")) %>%
+    mutate(method = "Bing et al."),
+  all_novels_auth %>% 
+    inner_join(get_sentiments("nrc") %>% 
+                 filter(sentiment %in% c("positive", 
+                                         "negative")) 
+    ) %>%
+    mutate(method = "NRC")) %>%
+  count(method, doc_id, sentiment, positionality, tot_words) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative) %>%
+  mutate(perc = sentiment / tot_words)%>%
+  mutate(positionality_choice = "Gender and Race")
+
+bing_and_nrc_race <-
+                bind_rows(
+  all_novels_race %>% 
+    inner_join(get_sentiments("bing")) %>%
+    mutate(method = "Bing et al."),
+  all_novels_race %>% 
+    inner_join(get_sentiments("nrc") %>% 
+                 filter(sentiment %in% c("positive", 
+                                         "negative"))
+    ) %>%
+    mutate(method = "NRC")) %>%
+  count(method, doc_id, sentiment, positionality, tot_words) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative) %>%
+  mutate(perc = sentiment / tot_words) %>%
+  mutate(positionality_choice = "Race") 
+
+
+bing_and_nrc_auth_gender <-
+                bind_rows(
+  all_novels_auth_gender %>% 
+    inner_join(get_sentiments("bing")) %>%
+    mutate(method = "Bing et al."),
+  all_novels_auth_gender %>% 
+    inner_join(get_sentiments("nrc") %>% 
+                 filter(sentiment %in% c("positive", 
+                                         "negative"))
+    ) %>%
+    mutate(method = "NRC")) %>%
+  count(method, doc_id, sentiment, positionality, tot_words) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative) %>%
+  mutate(perc = sentiment / tot_words) %>%
+  mutate(positionality_choice = "Gender")
+
+afinn_auth <- bind_rows(auth_afinn, race_afinn, auth_gender_afinn) 
+
+bing_and_nrc_auth <- bind_rows(bing_and_nrc_auth, bing_and_nrc_race, bing_and_nrc_auth_gender) 
+
+sent_per_auth <- bind_rows(afinn_auth, bing_and_nrc_auth) %>%
+  mutate(choice = "auth")
+
+
+#-----#
+  
+char_afinn <-
+    all_novels_char %>% 
+   inner_join(get_sentiments("afinn")) %>% 
+   group_by(doc_id, positionality, tot_words) %>% 
+   summarise(sentiment = sum(value)) %>% 
+  mutate(perc = sentiment/tot_words) %>%
+   mutate(method = "AFINN") %>%
+  mutate(positionality_choice = "Gender and Race")
+
+
+char_gender_afinn <-
+  all_novels_auth_gender %>% 
+   inner_join(get_sentiments("afinn")) %>% 
+   group_by(doc_id, positionality, tot_words) %>% 
+   summarise(sentiment = sum(value)) %>% 
+  mutate(perc = sentiment/tot_words) %>%
+   mutate(method = "AFINN") %>%
+  mutate(positionality_choice = "Gender")
+
+
+   #bing and nrc
+bing_and_nrc_char <- 
+  bind_rows(
+  all_novels_auth %>% 
+    inner_join(get_sentiments("bing")) %>%
+    mutate(method = "Bing et al."),
+  all_novels_auth %>% 
+    inner_join(get_sentiments("nrc") %>% 
+                 filter(sentiment %in% c("positive", 
+                                         "negative")) 
+    ) %>%
+    mutate(method = "NRC")) %>%
+  count(method, doc_id, sentiment, positionality, tot_words) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative) %>%
+  mutate(perc = sentiment / tot_words)%>%
+  mutate(positionality_choice = "Gender and Race")
+
+
+
+bing_and_nrc_char_gender <-
+                bind_rows(
+  all_novels_auth_gender %>% 
+    inner_join(get_sentiments("bing")) %>%
+    mutate(method = "Bing et al."),
+  all_novels_auth_gender %>% 
+    inner_join(get_sentiments("nrc") %>% 
+                 filter(sentiment %in% c("positive", 
+                                         "negative"))
+    ) %>%
+    mutate(method = "NRC")) %>%
+  count(method, doc_id, sentiment, positionality, tot_words) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative) %>%
+  mutate(perc = sentiment / tot_words) %>%
+  mutate(positionality_choice = "Gender")
+
+afinn_char <- bind_rows(char_afinn, race_afinn, char_gender_afinn) 
+
+bing_and_nrc_char <- bind_rows(bing_and_nrc_char, bing_and_nrc_race, bing_and_nrc_char_gender) 
+
+sent_per_char <- bind_rows(afinn_char, bing_and_nrc_char) %>%
+  mutate(choice = "char")
+
+sent_per <- bind_rows(sent_per_auth, sent_per_char)
+
+write.csv(sent_per, "data/sent_per")
+
+#NRC emotion percentages
+
+
+#Most common mental health words
+
+
+#Frequency of mental health terms in novel
+
+
+#Ratio of derogatory to non-derogatory words
+
+
+#Sentiment +-10 words around mental health words 
 ```
 
