@@ -21,8 +21,9 @@ wm_nest <- wm_df %>%
   mutate(text = str_squish(text)) %>%
   mutate(text = removeNumbers(text))
 #unnest
-wm_unnest <- wm_nest %>% 
-  unnest_tokens(output = "word", input = "text")
+wm_unnest_auth <- wm_nest %>% 
+  unnest_tokens(output = "word", input = "text") %>%
+  mutate(positionality_choice = "Gender and Race")
 #remove stop words and punctuation
 wm <- anti_join(wm_unnest, stop_words, by = c("word" = "word"), .keep_all = true)
 wm <- wm %>% mutate(word = removePunctuation(word))
@@ -33,7 +34,8 @@ wm_lem <- wm_lem %>%
   mutate(id = row_number()) 
 wm_lem_count <- wm %>% mutate(id = row_number())
 wm <- full_join(wm_lem, wm_lem_count, by = c("id" = "id"))
-wm <- wm %>% select(-id) %>% rename(lem = "wm_lem")
+wm_auth <- wm %>% select(-id) %>% rename(lem = "wm_lem") %>%
+  mutate(positionality_choice = "Gender and Race")
 
 #white female 
 #read
@@ -47,8 +49,9 @@ wf_nest <- wf_df %>%
   mutate(text = str_squish(text)) %>%
   mutate(text = removeNumbers(text))
 #unnest
-wf_unnest <- wf_nest %>% 
-  unnest_tokens(output = "word", input = "text")
+wf_unnest_auth <- wf_nest %>% 
+  unnest_tokens(output = "word", input = "text") %>%
+  mutate(positionality_choice = "Gender and Race")
 #remove stop words
 wf <- anti_join(wf_unnest, stop_words, by = c("word" = "word"), .keep_all = true)
 wf <- wf %>% mutate(word = removePunctuation(word))
@@ -59,7 +62,8 @@ wf_lem <- wf_lem %>%
   mutate(id = row_number()) 
 wf_lem_count <- wf %>% mutate(id = row_number())
 wf <- full_join(wf_lem, wf_lem_count, by = c("id" = "id"))
-wf <- wf %>% select(-id) %>% rename(lem = "wf_lem")
+wf_auth <- wf %>% select(-id) %>% rename(lem = "wf_lem") %>%
+  mutate(positionality_choice = "Gender and Race")
 
 #black female 
 #read
@@ -73,8 +77,9 @@ bf_nest <- bf_df %>%
   mutate(text = str_squish(text)) %>%
   mutate(text = removeNumbers(text))
 #unnest
-bf_unnest <- bf_nest %>% 
-  unnest_tokens(output = "word", input = "text")
+bf_unnest_auth <- bf_nest %>% 
+  unnest_tokens(output = "word", input = "text") %>%
+  mutate(positionality_choice = "Gender and Race")
 #remove stop words
 bf <- anti_join(bf_unnest, stop_words, by = c("word" = "word"), .keep_all = true)
 bf <- bf %>% mutate(word = removePunctuation(word))
@@ -85,18 +90,19 @@ bf_lem <- bf_lem %>%
   mutate(id = row_number()) 
 bf_lem_count <- bf %>% mutate(id = row_number())
 bf <- full_join(bf_lem, bf_lem_count, by = c("id" = "id"))
-bf <- bf %>% select(-id) %>% rename(lem = "bf_lem")
+bf_auth <- bf %>% select(-id) %>% rename(lem = "bf_lem") %>%
+  mutate(positionality_choice = "Gender and Race")
 
 #remove unneeded
 rm(wm_df, wm_lem_count, wf_df, wf_lem_count, bf_df, bf_lem_count, wm_nest, wf_nest, bf_nest)
 
 
-write.csv(wm_unnest, "data/wm_unnest_auth")
-write.csv(wf_unnest, "data/wf_unnest_auth")
-write.csv(bf_unnest, "data/bf_unnest_auth")
-write.csv(wm, "data/wm_auth")
-write.csv(wf, "data/wf_auth")
-write.csv(bf, "data/bf_auth")
+write.csv(wm_unnest_auth, "data/wm_unnest_auth")
+write.csv(wf_unnest_auth, "data/wf_unnest_auth")
+write.csv(bf_unnest_auth, "data/bf_unnest_auth")
+write.csv(wm_auth, "data/wm_auth")
+write.csv(wf_auth, "data/wf_auth")
+write.csv(bf_auth, "data/bf_auth")
 ```
 
 BY PROTAG POSITIONALITY
@@ -113,8 +119,9 @@ wm_nest <- wm_df %>%
   mutate(text = str_squish(text)) %>%
   mutate(text = removeNumbers(text))
 #unnest
-wm_unnest <- wm_nest %>% 
-  unnest_tokens(output = "word", input = "text")
+wm_unnest_char <- wm_nest %>% 
+  unnest_tokens(output = "word", input = "text") %>%
+  mutate(positionality_choice = "Gender and Race")
 #remove stop words and punctuation
 wm <- anti_join(wm_unnest, stop_words, by = c("word" = "word"), .keep_all = true)
 wm <- wm %>% mutate(word = removePunctuation(word))
@@ -125,7 +132,8 @@ wm_lem <- wm_lem %>%
   mutate(id = row_number()) 
 wm_lem_count <- wm %>% mutate(id = row_number())
 wm <- full_join(wm_lem, wm_lem_count, by = c("id" = "id"))
-wm <- wm %>% select(-id) %>% rename(lem = "wm_lem")
+wm_char <- wm %>% select(-id) %>% rename(lem = "wm_lem") %>%
+  mutate(positionality_choice = "Gender and Race")
 
 #white female 
 #read
@@ -139,8 +147,9 @@ wf_nest <- wf_df %>%
   mutate(text = str_squish(text)) %>%
   mutate(text = removeNumbers(text))
 #unnest
-wf_unnest <- wf_nest %>% 
-  unnest_tokens(output = "word", input = "text")
+wf_unnest_char <- wf_nest %>% 
+  unnest_tokens(output = "word", input = "text") %>%
+  mutate(positionality_choice = "Gender and Race")
 #remove stop words
 wf <- anti_join(wf_unnest, stop_words, by = c("word" = "word"), .keep_all = true)
 wf <- wf %>% mutate(word = removePunctuation(word))
@@ -151,7 +160,8 @@ wf_lem <- wf_lem %>%
   mutate(id = row_number()) 
 wf_lem_count <- wf %>% mutate(id = row_number())
 wf <- full_join(wf_lem, wf_lem_count, by = c("id" = "id"))
-wf <- wf %>% select(-id) %>% rename(lem = "wf_lem")
+wf_char <- wf %>% select(-id) %>% rename(lem = "wf_lem") %>%
+  mutate(positionality_choice = "Gender and Race")
 
 #black female 
 #read
@@ -165,8 +175,9 @@ bf_nest <- bf_df %>%
   mutate(text = str_squish(text)) %>%
   mutate(text = removeNumbers(text))
 #unnest
-bf_unnest <- bf_nest %>% 
-  unnest_tokens(output = "word", input = "text")
+bf_unnest_char <- bf_nest %>% 
+  unnest_tokens(output = "word", input = "text") %>%
+  mutate(positionality_choice = "Gender and Race")
 #remove stop words
 bf <- anti_join(bf_unnest, stop_words, by = c("word" = "word"), .keep_all = true)
 bf <- bf %>% mutate(word = removePunctuation(word))
@@ -177,7 +188,8 @@ bf_lem <- bf_lem %>%
   mutate(id = row_number()) 
 bf_lem_count <- bf %>% mutate(id = row_number())
 bf <- full_join(bf_lem, bf_lem_count, by = c("id" = "id"))
-bf <- bf %>% select(-id) %>% rename(lem = "bf_lem")
+bf_char <- bf %>% select(-id) %>% rename(lem = "bf_lem") %>%
+  mutate(positionality_choice = "Gender and Race")
 
 #remove unneeded
 rm(wm_df, wm_lem_count, wf_df, wf_lem_count, bf_df, bf_lem_count, wm_nest, wf_nest, bf_nest)
@@ -207,8 +219,9 @@ male_nest <- male %>%
   mutate(text = str_squish(text)) %>%
   mutate(text = removeNumbers(text))
 #unnest
-male_unnest <- male_nest %>% 
-  unnest_tokens(output = "word", input = "text")
+male_unnest_char <- male_nest %>% 
+  unnest_tokens(output = "word", input = "text") %>%
+  mutate(positionality_choice = "Gender")
 #remove stop words and punctuation
 male <- anti_join(male_unnest, stop_words, by = c("word" = "word"), .keep_all = true)
 male <- male %>% mutate(word = removePunctuation(word))
@@ -219,7 +232,8 @@ male_lem <- male_lem %>%
   mutate(id = row_number()) 
 male_lem_count <- male %>% mutate(id = row_number())
 male <- full_join(male_lem, male_lem_count, by = c("id" = "id"))
-male_char_gender <- male %>% select(-id) %>% rename(lem = "male_lem")
+male_char <- male %>% select(-id) %>% rename(lem = "male_lem") %>%
+  mutate(positionality_choice = "Gender")
 
 #female 
 wf <- readtext("data/white_fem_char", cache=FALSE)
@@ -234,8 +248,9 @@ fem_nest <- fem %>%
   mutate(text = str_squish(text)) %>%
   mutate(text = removeNumbers(text))
 #unnest
-fem_unnest <- fem_nest %>% 
-  unnest_tokens(output = "word", input = "text")
+fem_unnest_char <- fem_nest %>% 
+  unnest_tokens(output = "word", input = "text") %>%
+  mutate(positionality_choice = "Gender")
 #remove stop words and punctuation
 fem <- anti_join(fem_unnest, stop_words, by = c("word" = "word"), .keep_all = true)
 fem <- fem %>% mutate(word = removePunctuation(word))
@@ -246,16 +261,17 @@ fem_lem <- fem_lem %>%
   mutate(id = row_number()) 
 fem_lem_count <- fem %>% mutate(id = row_number())
 fem <- full_join(fem_lem, fem_lem_count, by = c("id" = "id"))
-fem_char_gender <- fem %>% select(-id) %>% rename(lem = "fem_lem")
+fem_char <- fem %>% select(-id) %>% rename(lem = "fem_lem") %>%
+  mutate(positionality_choice = "Gender")
 
 #remove unneeded
 rm(wm, male_lem_count, wf, fem_lem_count, bf, bm, male_nest, fem_nest)
 
 
-write.csv(fem_unnest, "data/fem_unnest_char_gender")
-write.csv(male_unnest, "data/male_unnest_char_gender")
-write.csv(fem_char_gender, "data/fem_char_gender")
-write.csv(male_char_gender, "data/male_char_gender")
+write.csv(fem_unnest_char, "data/fem_unnest_char")
+write.csv(male_unnest_char, "data/male_unnest_char")
+write.csv(fem_char, "data/fem_char")
+write.csv(male_char, "data/male_char")
 ```
 
 BY GENDER AUTH
@@ -274,8 +290,9 @@ male_nest <- male %>%
   mutate(text = str_squish(text)) %>%
   mutate(text = removeNumbers(text))
 #unnest
-male_unnest <- male_nest %>% 
-  unnest_tokens(output = "word", input = "text")
+male_unnest_auth <- male_nest %>% 
+  unnest_tokens(output = "word", input = "text") %>%
+  mutate(positionality_choice = "Gender")
 #remove stop words and punctuation
 male <- anti_join(male_unnest, stop_words, by = c("word" = "word"), .keep_all = true)
 male <- male %>% mutate(word = removePunctuation(word))
@@ -286,7 +303,8 @@ male_lem <- male_lem %>%
   mutate(id = row_number()) 
 male_lem_count <- male %>% mutate(id = row_number())
 male <- full_join(male_lem, male_lem_count, by = c("id" = "id"))
-male_auth_gender <- male %>% select(-id) %>% rename(lem = "male_lem")
+male_auth <- male %>% select(-id) %>% rename(lem = "male_lem") %>%
+  mutate(positionality_choice = "Gender")
 
 #female 
 wf <- readtext("data/white_fem_auth", cache=FALSE)
@@ -301,8 +319,9 @@ fem_nest <- fem %>%
   mutate(text = str_squish(text)) %>%
   mutate(text = removeNumbers(text))
 #unnest
-fem_unnest <- fem_nest %>% 
-  unnest_tokens(output = "word", input = "text")
+fem_unnest_auth <- fem_nest %>% 
+  unnest_tokens(output = "word", input = "text") %>%
+  mutate(positionality_choice = "Gender")
 #remove stop words and punctuation
 fem <- anti_join(fem_unnest, stop_words, by = c("word" = "word"), .keep_all = true)
 fem <- fem %>% mutate(word = removePunctuation(word))
@@ -313,16 +332,17 @@ fem_lem <- fem_lem %>%
   mutate(id = row_number()) 
 fem_lem_count <- fem %>% mutate(id = row_number())
 fem <- full_join(fem_lem, fem_lem_count, by = c("id" = "id"))
-fem_auth_gender <- fem %>% select(-id) %>% rename(lem = "fem_lem")
+fem_auth <- fem %>% select(-id) %>% rename(lem = "fem_lem") %>%
+  mutate(positionality_choice = "Gender")
 
 #remove unneeded
 rm(wm, male_lem_count, wf, fem_lem_count, bf, bm, fem_nest, male_nest)
 
 
-write.csv(fem_unnest, "data/fem_unnest_auth_gender")
-write.csv(male_unnest, "data/male_unnest_auth_gender")
-write.csv(fem_auth_gender, "data/fem_auth_gender")
-write.csv(male_auth_gender, "data/male_auth_gender")
+write.csv(fem_unnest_auth, "data/fem_unnest_auth")
+write.csv(male_unnest_auth, "data/male_unnest_auth")
+write.csv(fem_auth, "data/fem_auth")
+write.csv(male_auth, "data/male_auth")
 ```
 
 RACE
@@ -394,46 +414,164 @@ write.csv(b, "data/b")
 DFs
 ```{r}
 #all novels
-all_novels_auth <- bind_rows(wm_auth, wf_auth, bf_auth) %>%
+all_novels_auth_both <- bind_rows(wm_auth, wf_auth, bf_auth) %>%
   group_by(doc_id) %>%
   mutate(id = row_number()) %>%
   mutate(tot_words = n()) %>%
-  ungroup() 
+  ungroup() %>%
+  mutate(positionality_choice = "Gender and Race")
 
 all_novels_auth_gender <- bind_rows(fem_auth_gender, male_auth_gender) %>%
   group_by(doc_id) %>%
   mutate(id = row_number()) %>%
   mutate(tot_words = n()) %>%
-  ungroup() 
+  ungroup() %>%
+  mutate(positionality_choice = "Gender")
 
 
 all_novels_race <- bind_rows(w, b) %>%
   group_by(doc_id) %>%
   mutate(id = row_number()) %>%
   mutate(tot_words = n()) %>%
-  ungroup() 
+  ungroup() %>%
+  mutate(positionality_choice = "Race")
 
 
-all_novels_char <- bind_rows(wm_char, wf_char, bf_char) %>%
+all_novels_char_both <- bind_rows(wm_char, wf_char, bf_char) %>%
   group_by(doc_id) %>%
   mutate(id = row_number()) %>%
   mutate(tot_words = n()) %>%
-  ungroup() 
+  ungroup() %>%
+  mutate(positionality_choice = "Gender and Race")
 
 all_novels_char_gender <- bind_rows(fem_char_gender, male_char_gender) %>%
   group_by(doc_id) %>%
   mutate(id = row_number()) %>%
   mutate(tot_words = n()) %>%
-  ungroup() 
+  ungroup() %>%
+  mutate(positionality_choice = "Gender")
 
-#VISUALIZATIONS !!!
+all_novels_auth <- bind_rows(all_novels_auth_both, all_novels_auth_gender, all_novels_race)
+write.csv(all_novels_auth, "data/all_novels_auth")
 
+all_novels_char <- bind_rows(all_novels_char_both, all_novels_auth_gender, all_novels_race)
+write.csv(all_novels_char, "data/all_novels_char")
+
+novels_with_stop_list_race <- list(w_unnest, b_unnest)
+novels_with_stop_list_char_gender <- list(fem_unnest_char_gender, male_unnest_char_gender)
+novels_with_stop_list_char_both <- list(wm_unnest_char, wf_unnest_char, bf_unnest_char)
+novels_with_stop_list_auth_gender <- list(fem_unnest_auth_gender, male_unnest_auth_gender)
+novels_with_stop_list_auth_both <- list(wm_unnest_auth, wf_unnest_auth, bf_unnest_auth)
+```
+
+
+VISUALIZATIONS !!!
+```{r}
 #Most common words used
 
+top_10_words_wm_auth <- 
+  wm_auth %>%
+    count(doc_id, word) %>%
+  group_by(doc_id) %>%
+  mutate(tot_words = sum(n)) %>%
+  ungroup() %>%
+  group_by(word) %>%
+    mutate(book_count = n()) %>%
+    filter(book_count>=2) %>% #tried 8 and keeps the same :)
+    mutate(freq = n / tot_words) %>%
+    group_by(word) %>%
+    summarize(tot_freq = sum(freq)) %>%
+  slice_max(tot_freq, n=10) %>%
+  mutate(word = fct_reorder(.f = word, .x = tot_freq)) %>%
+  mutate(positionality_choice = "Gender and Race")
+
+top_10_words_wf_auth <- 
+  wf_auth %>%
+    count(doc_id, word) %>%
+  group_by(doc_id) %>%
+  mutate(tot_words = sum(n)) %>%
+  ungroup() %>%
+  group_by(word) %>%
+    mutate(book_count = n()) %>%
+    filter(book_count>=2) %>% #tried 8 and keeps the same :)
+    mutate(freq = n / tot_words) %>%
+    group_by(word) %>%
+    summarize(tot_freq = sum(freq)) %>%
+  slice_max(tot_freq, n=10) %>%
+  mutate(word = fct_reorder(.f = word, .x = tot_freq)) %>%
+  mutate(positionality_choice = "Gender and Race")
+
+top_10_words_bf_auth <- 
+  wm_auth %>%
+    count(doc_id, word) %>%
+  group_by(doc_id) %>%
+  mutate(tot_words = sum(n)) %>%
+  ungroup() %>%
+  group_by(word) %>%
+    mutate(book_count = n()) %>%
+    filter(book_count>=2) %>% #tried 8 and keeps the same :)
+    mutate(freq = n / tot_words) %>%
+    group_by(word) %>%
+    summarize(tot_freq = sum(freq)) %>%
+  slice_max(tot_freq, n=10) %>%
+  mutate(word = fct_reorder(.f = word, .x = tot_freq)) %>%
+  mutate(positionality_choice = "Gender and Race")
+
+top_10_words_fem_auth <- 
+  wm_auth %>%
+    count(doc_id, word) %>%
+  group_by(doc_id) %>%
+  mutate(tot_words = sum(n)) %>%
+  ungroup() %>%
+  group_by(word) %>%
+    mutate(book_count = n()) %>%
+    filter(book_count>=2) %>% #tried 8 and keeps the same :)
+    mutate(freq = n / tot_words) %>%
+    group_by(word) %>%
+    summarize(tot_freq = sum(freq)) %>%
+  slice_max(tot_freq, n=10) %>%
+  mutate(word = fct_reorder(.f = word, .x = tot_freq)) %>%
+  mutate(positionality_choice = "Gender and Race")
+
+top_10_words_wf_auth <- 
+  wf_auth %>%
+    count(doc_id, word) %>%
+  group_by(doc_id) %>%
+  mutate(tot_words = sum(n)) %>%
+  ungroup() %>%
+  group_by(word) %>%
+    mutate(book_count = n()) %>%
+    filter(book_count>=2) %>% #tried 8 and keeps the same :)
+    mutate(freq = n / tot_words) %>%
+    group_by(word) %>%
+    summarize(tot_freq = sum(freq)) %>%
+  slice_max(tot_freq, n=10) %>%
+  mutate(word = fct_reorder(.f = word, .x = tot_freq)) %>%
+  mutate(positionality_choice = "Gender and Race")
+
+top_10_words_bf_auth <- 
+  wm_auth %>%
+    count(doc_id, word) %>%
+  group_by(doc_id) %>%
+  mutate(tot_words = sum(n)) %>%
+  ungroup() %>%
+  group_by(word) %>%
+    mutate(book_count = n()) %>%
+    filter(book_count>=2) %>% #tried 8 and keeps the same :)
+    mutate(freq = n / tot_words) %>%
+    group_by(word) %>%
+    summarize(tot_freq = sum(freq)) %>%
+  slice_max(tot_freq, n=10) %>%
+  mutate(word = fct_reorder(.f = word, .x = tot_freq)) %>%
+  mutate(positionality_choice = "Gender and Race")
+
+write.csv(top_10_words_wm_auth, "data/top_10_words_wm_auth")
+write.csv(top_10_words_wf_auth, "data/top_10_words_wf_auth")
+write.csv(top_10_words_bf_auth, "data/top_10_words_bf_auth")
 
 #Sentiment score per novel
 auth_afinn <-
-    all_novels_auth %>% 
+    all_novels_auth_both %>% 
    inner_join(get_sentiments("afinn")) %>% 
    group_by(doc_id, positionality, tot_words) %>% 
    summarise(sentiment = sum(value)) %>% 
@@ -465,10 +603,10 @@ auth_gender_afinn <-
    #bing and nrc
 bing_and_nrc_auth <- 
   bind_rows(
-  all_novels_auth %>% 
+  all_novels_auth_both %>% 
     inner_join(get_sentiments("bing")) %>%
     mutate(method = "Bing et al."),
-  all_novels_auth %>% 
+  all_novels_auth_both %>% 
     inner_join(get_sentiments("nrc") %>% 
                  filter(sentiment %in% c("positive", 
                                          "negative")) 
@@ -526,7 +664,7 @@ sent_per_auth <- bind_rows(afinn_auth, bing_and_nrc_auth) %>%
 #-----#
   
 char_afinn <-
-    all_novels_char %>% 
+    all_novels_char_both %>% 
    inner_join(get_sentiments("afinn")) %>% 
    group_by(doc_id, positionality, tot_words) %>% 
    summarise(sentiment = sum(value)) %>% 
@@ -536,7 +674,7 @@ char_afinn <-
 
 
 char_gender_afinn <-
-  all_novels_auth_gender %>% 
+  all_novels_char_gender %>% 
    inner_join(get_sentiments("afinn")) %>% 
    group_by(doc_id, positionality, tot_words) %>% 
    summarise(sentiment = sum(value)) %>% 
@@ -548,10 +686,10 @@ char_gender_afinn <-
    #bing and nrc
 bing_and_nrc_char <- 
   bind_rows(
-  all_novels_auth %>% 
+  all_novels_char_both %>% 
     inner_join(get_sentiments("bing")) %>%
     mutate(method = "Bing et al."),
-  all_novels_auth %>% 
+  all_novels_char_both %>% 
     inner_join(get_sentiments("nrc") %>% 
                  filter(sentiment %in% c("positive", 
                                          "negative")) 
@@ -567,10 +705,10 @@ bing_and_nrc_char <-
 
 bing_and_nrc_char_gender <-
                 bind_rows(
-  all_novels_auth_gender %>% 
+  all_novels_char_gender %>% 
     inner_join(get_sentiments("bing")) %>%
     mutate(method = "Bing et al."),
-  all_novels_auth_gender %>% 
+  all_novels_char_gender %>% 
     inner_join(get_sentiments("nrc") %>% 
                  filter(sentiment %in% c("positive", 
                                          "negative"))
@@ -592,10 +730,116 @@ sent_per_char <- bind_rows(afinn_char, bing_and_nrc_char) %>%
 sent_per <- bind_rows(sent_per_auth, sent_per_char)
 
 write.csv(sent_per, "data/sent_per")
+```
 
-#NRC emotion percentages
+MENTAL HEALTH
+```{r}
+MH <- tibble(word=c("insane", "lobotomy", "hysteria", "electroshock", "lunatic", "psychotic", "nuts", "crazy", "deranged", "demented", "asylum", "loony", "retarded", "retard", "freak", "madness", "hydrotherapy", "delirious", "sociopath", "sociopathic", "disturbed", "psycho", "mad", "weird", "spastic", "halfwit", "meltdown", "outcast", "nutty", "killyourself", "killmyself", "killherself", "killhimself", "perverted", "spaz", "strange", "twisted", "weirdo", "psychopath", "psychopathic", "institutionalized", "therapy", "therapist", "psychiatrist", "psychiatric", "medication", "suicidal", "suicide", "mentallyill", "mentalillness", "diagnosis", "depression", "depressed", "anxiety", "anxieties", "psychosis", "dissociate", "dissociated", "dissociation", "intrusivethought", "intrusivethoughts", "thoughtspiral", "sleepparalysis", "multiplepersonality", "splitpersonality", "dissociative", "bipolar", "bpd", "borderlinepersonality", "schizophrenia", "schizophrenic", "ptsd", "dsm", "mentaldisorder", "mentalhealth", "anorexia", "bulimia", "bingeeating", "manic", "autism", "hallucinations", "hallucination", "ocd", "psychoanalysis", "trigger", "panicattack", "panicdisorder", "coping", "compulsion", "antisocialpersonality",  "selfharm", "selfmutilation", "selfinjury", "selfharmers", "selfharmer", "straitjacket", "mentalhospital", "mentalinstitution", "depersonalization", "obsessivecompulsive", "psychiatry", "delirium", "mania", "melancholia", "monomania", "traumatic", "trauma", "cutter", "cutting", "schizo", "delusional", "alters", "shellshock", "insomnia", "neurosis", "neurotic", "delusions", "survivorsguilt", "mentalcase", "agoraphobia", "mentallychallenged", "abnormal", "mentalpatient"))
+
+neg_mh <- tibble(word=c("insane", "lobotomy", "hysteria", "electroshock", "lunatic", "psychotic", "nuts", "crazy", "deranged", "demented", "asylum", "loony", "retarded", "retard", "freak", "madness", "hydrotherapy", "delirious", "sociopath", "sociopathic", "disturbed", "psycho", "mad", "weird", "spastic", "halfwit", "meltdown", "outcast", "nutty", "killyourself", "killmyself", "killherself", "killhimself", "perverted", "spaz", "strange", "twisted", "weirdo", "psychopath", "psychopathic", "cutter", "cutting", "schizo", "delusional", "shellshock", "neurosis", "neurotic", "mentalcase", "multiplepersonality", "splitpersonality", "abnormal"))
+
+pos_mh <- tibble(word=c("institutionalized", "therapy", "therapist", "psychiatrist", "psychiatric", "medication", "suicidal", "suicide", "mentallyill", "mentalillness", "mentalhealth", "diagnosis", "depression", "depressed", "anxiety", "anxieties", "psychosis", "dissociate", "dissociated", "dissociation", "intrusivethoughts", "intrusivethought", "thoughtspiral", "sleepparalysis", "dissociative", "bipolar", "bpd", "borderlinepersonality", "schizophrenia", "schizophrenic", "ptsd", "dsm", "mentaldisorder", "anorexia", "bulimia", "bingeeating", "manic", "autism", "hallucinations", "hallucination", "ocd", "psychoanalysis", "trigger", "panicattack", "panicdisorder", "coping", "compulsion", "antisocialpersonality",  "selfharm", "selfmutilation", "selfinjury", "selfharmers", "selfharmer", "straitjacket", "mentalinstitution", "mentalhospital", "depersonalization", "obsessivecompulsive", "psychiatry", "delirium", "mania", "melancholia", "monomania", "traumatic", "trauma", "alters", "insomnia", "delusions", "survivors guilt", "agoraphobia", "mentalpatient"))
+```
+
+Fix 2 word mh terms
+```{r}
+combo <- function(data_set) { 
+  combo_df <- data_set %>%
+  mutate(next_word = lead(word)) %>%
+  ungroup() %>%
+  mutate(word =
+           case_when(word=="mentally" & next_word=="challenged" ~ "mentallychallenged",
+                     word=="kill" & next_word=="yourself" ~ "killyourself", 
+                     word=="kill" & next_word=="myself" ~ "killmyself", 
+                     word=="kill" & next_word=="herself" ~ "killherself", 
+                     word=="kill" & next_word=="himself" ~ "killhimself",
+                     word=="multiple" & next_word=="personality" ~ "multiplepersonality",
+                     word=="mentally" & next_word=="ill" ~ "mentallyill",
+                     word=="mental" & next_word=="illness" ~ "mentalillness",
+                     word=="intrusive" & next_word=="thoughts" ~ "intrusivethoughts",
+                     word=="intrusive" & next_word=="thought" ~ "intrusivethought",
+                     word=="thought" & next_word=="spiral" ~ "thoughtspiral",
+                     word=="multiple" & next_word=="personality" ~ "multiplepersonality",
+                     word=="split" & next_word=="personality" ~ "splitpersonality",
+                     word=="borderline" & next_word=="personality" ~ "borderlinepersonality",
+                     word=="binge" & next_word=="eating" ~ "bingeeating",
+                     word=="self" & next_word=="harm" ~ "selfharm",
+                     word=="self" & next_word=="mutilation" ~ "selfmutilation",
+                     word=="self" & next_word=="injury" ~ "selfinjury",
+                     word=="self" & next_word=="harmers" ~ "selfharmers",
+                     word=="self" & next_word=="harmer" ~ "selfharmer",
+                     word=="mental" & next_word=="hospital" ~ "mentalhospital",
+                     word=="mental" & next_word=="institution" ~ "mentalinstitution",
+                     word=="obsessive" & next_word=="compulsive" ~ "obsessivecompulsive", 
+                     word=="shell" & next_word=="shock" ~ "shellshock",
+                     word=="survivors" & next_word=="guilt" ~ "survivorsguilt",
+                     word=="mental" & next_word=="case" ~ "mentalcase",
+                     word=="sleep" & next_word=="paralysis" ~ "sleepparalysis",
+                     word=="panic" & next_word=="attack" ~ "panicattack",
+                     word=="panic" & next_word=="disorder" ~ "panicdisorder",
+                     word=="antisocial" & next_word=="personality" ~ "antisocialpersonality",
+                     word=="mental" & next_word=="patient" ~ "mentalpatient",
+                     TRUE ~ word)) %>% #remove next word
+    select(!next_word)
+  #remove stop words
+  combo_df <- anti_join(combo_df, stop_words, by = c("word" = "word"), .keep_all = true)
+  combo_df <- combo_df %>% mutate(word = removePunctuation(word)) %>%
+    group_by(doc_id) %>%
+    mutate(id = row_number()) %>%
+    mutate(tot_words = n()) %>%
+    ungroup()
+}
+combo_list <- map(novels_with_stop_list, combo)
+combo <- bind_rows(combo_list)
+
+#combo with stop for 10+-
+combo_with_stop <- function(data_set) { 
+  combo_df <- data_set %>%
+  mutate(next_word = lead(word)) %>%
+  ungroup() %>%
+  mutate(word =
+           case_when(word=="mentally" & next_word=="challenged" ~ "mentallychallenged",
+                     word=="kill" & next_word=="yourself" ~ "killyourself", 
+                     word=="kill" & next_word=="myself" ~ "killmyself", 
+                     word=="kill" & next_word=="herself" ~ "killherself", 
+                     word=="kill" & next_word=="himself" ~ "killhimself",
+                     word=="multiple" & next_word=="personality" ~ "multiplepersonality",
+                     word=="mentally" & next_word=="ill" ~ "mentallyill",
+                     word=="mental" & next_word=="illness" ~ "mentalillness",
+                     word=="intrusive" & next_word=="thoughts" ~ "intrusivethoughts",
+                     word=="intrusive" & next_word=="thought" ~ "intrusivethought",
+                     word=="thought" & next_word=="spiral" ~ "thoughtspiral",
+                     word=="multiple" & next_word=="personality" ~ "multiplepersonality",
+                     word=="split" & next_word=="personality" ~ "splitpersonality",
+                     word=="borderline" & next_word=="personality" ~ "borderlinepersonality",
+                     word=="binge" & next_word=="eating" ~ "bingeeating",
+                     word=="self" & next_word=="harm" ~ "selfharm",
+                     word=="self" & next_word=="mutilation" ~ "selfmutilation",
+                     word=="self" & next_word=="injury" ~ "selfinjury",
+                     word=="self" & next_word=="harmers" ~ "selfharmers",
+                     word=="self" & next_word=="harmer" ~ "selfharmer",
+                     word=="mental" & next_word=="hospital" ~ "mentalhospital",
+                     word=="mental" & next_word=="institution" ~ "mentalinstitution",
+                     word=="obsessive" & next_word=="compulsive" ~ "obsessivecompulsive", 
+                     word=="shell" & next_word=="shock" ~ "shellshock",
+                     word=="survivors" & next_word=="guilt" ~ "survivorsguilt",
+                     word=="mental" & next_word=="case" ~ "mentalcase",
+                     word=="sleep" & next_word=="paralysis" ~ "sleepparalysis",
+                     word=="panic" & next_word=="attack" ~ "panicattack",
+                     word=="panic" & next_word=="disorder" ~ "panicdisorder",
+                     word=="antisocial" & next_word=="personality" ~ "antisocialpersonality",
+                     word=="mental" & next_word=="patient" ~ "mentalpatient",
+                     TRUE ~ word)) %>% #remove next word
+    select(!next_word)
+  #remove punctuation
+  combo_df <- combo_df %>% mutate(word = removePunctuation(word))
+}
+combo_with_stop_list <- map(novels_with_stop_list, combo_with_stop)
+combo_with_stop <- bind_rows(combo_with_stop_list)
+```
 
 
+```{r}
 #Most common mental health words
 
 
