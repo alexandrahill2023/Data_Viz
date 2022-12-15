@@ -5,117 +5,30 @@ library(ggbeeswarm) #swarm plot
 library(tidytext) #get sentiments
 ```
 
-Data
-```{r}
-# BY AUTHOR POSITIONALITY
-wm_unnest_auth <- read_csv("data/wm_unnest_auth") %>% select(!1)
-wf_unnest_auth <- read_csv("data/wf_unnest_auth")%>% select(!1)
-bf_unnest_auth <- read_csv("data/bf_unnest_auth")%>% select(!1)
-wm_auth <- read_csv("data/wm_auth") %>% select(!1)
-wf_auth <- read_csv("data/wf_auth")%>% select(!1)
-bf_auth <- read_csv("data/bf_auth")%>% select(!1)
-
-#all novels together
-
-novel_list_auth <- list(wm_auth, wf_auth, bf_auth)
-
-
-# BY PROTAG POSITIONALITY
-wm_unnest_char <- read_csv("data/wm_unnest_char")%>% select(!1)
-wf_unnest_char <- read_csv("data/wf_unnest_char")%>% select(!1)
-bf_unnest_char <- read_csv("data/bf_unnest_char")%>% select(!1)
-wm_char <- read_csv("data/wm_char")%>% select(!1)
-wf_char <- read_csv("data/wf_char")%>% select(!1)
-bf_char <- read_csv("data/bf_char")%>% select(!1)
-
-#all novels together
-
-novel_list_char <- list(wm_char, wf_char, bf_char)
-
-
-# BY GENDER PROTOG
-fem_unnest_char_gender <- read_csv("data/fem_unnest_char_gender")
-male_unnest_char_gender <- read_csv("data/male_unnest_char_gender")
-fem_char_gender <- read_csv("data/fem_char_gender")
-male_char_gender <- read_csv("data/male_char_gender")
-
-#all novels together
-
-novel_list_char_gender <- list(fem_char_gender, male_char_gender)
-
-
-# BY GENDER AUTH
-fem_unnest_auth_gender <- read_csv("data/fem_unnest_auth_gender")%>% select(!1)
-male_unnest_auth_gender <- read_csv("data/male_unnest_auth_gender")%>% select(!1)
-fem_auth_gender <- read_csv("data/fem_auth_gender")%>% select(!1)
-male_auth_gender <- read_csv("data/male_auth_gender")%>% select(!1)
-
-#all novels together
-
-novel_list_auth_gender <- list(fem_auth_gender, male_auth_gender)
-
-
-# RACE
-w_unnest <- read_csv("data/w_unnest") %>% select(!1)
-b_unnest <- read_csv("data/b_unnest")%>% select(!1)
-w <- read_csv("data/w")%>% select(!1)
-b <- read_csv("data/b")%>% select(!1)
-
-#all novels together
-
-novel_list_race <- list(w, b) 
-```
-
 DFs
 ```{r}
-novels_with_stop_list_auth <- bind_rows()
 
 all_novels_auth <- read_csv("data/all_novels_auth")
 all_novels_char <- read_csv("data/all_novels_char")
 
 sent_per <- read_csv("data/sent_per")
 
-top_10_words_wm_auth <- read_csv("data/top_10_words_wm_auth")
-top_10_words_wf_auth <- read_csv("data/top_10_words_wf_auth")
-top_10_words_bf_auth <- read_csv("data/top_10_words_bf_auth")
+top_10_words <- read_csv("data/top_10_words")
+
+combo_with_stop <- read_csv("data/combo_with_stop")
+combo_remove_stop <- read_csv("data/combo_remove_stop")
+
+MHcount <- read_csv("data/MHcount")
+
+top_10_mh <- read_csv("data/top_10_mh")
+
+sentiment_around_mh <- read_csv("data/sentiment_around_mh")
+
 ```
 
-
-Frequency of MH words
-```{r}
-MHcount <- combo %>%
-  inner_join(MH) %>%
-  group_by(doc_id) %>%
-  summarise(positionality = positionality, 
-            mh_tot = n(), mh_perc = mh_tot / tot_words) %>%
-  ungroup() %>% distinct()
-
-MHcount %>%
-  ggplot(aes(x= positionality, y=mh_perc, color = positionality)) +
-  geom_beeswarm(cex = 3) +
-  labs(x = "Positionality",
-       y = "Percentage of Mental Health Terms") + 
-  theme(legend.position = "none") +
-  scale_colour_brewer(palette = "Accent") +
-  stat_summary(
-    geom = "point",
-    fun = "mean",
-    col = "black",
-    size = 1,
-    shape = 24,
-    fill = "black"
-  )
-
-#table - USE AS TABLE REF FOR ANY I WANT TABLE FOR
-MHcount_table <- MHcount %>% 
-  arrange(desc(mh_perc))
-MHcount_table %>% kable()
-```
 
 Running shiny app
 ```{r}
-
-
 library(shiny)
 
 ui <- fluidPage(
@@ -126,7 +39,7 @@ ui <- fluidPage(
     
     sidebarPanel(
       # Inputs 
-      radioButtons("positionality_choice", label = "What aspects of positionality do you want to investigate?", choices = c("Gender and Race", "Race", "Gender")),
+      radioButtons("positionality_choice", label = "What aspects of positionality do you want to investigate?", choices = c("Gender and Race", "Gender", "Race")),
       selectizeInput("viz_choice",
                                 label = "What would you like to visualize?", 
                                 choices = c("Most common words used", "Sentiment score per novel", "NRC emotion percentages", "Most common mental health words", "Frequency of mental health terms in novel","Frequency of derogatory mental health words","Ratio of derogatory to non-derogatory words","Sentiment +-10 words around mental health words"),
@@ -136,7 +49,26 @@ ui <- fluidPage(
     mainPanel(
       tabsetPanel(
         # tabs and reactive visuals
-        tabPanel("Project Overview", textOutput("overview")),
+        tabPanel("Project Overview", br(),
+        p("This is the corresponding Shiny App to my research 
+        exploring the portrayal of mental health in literature and 
+        how positionality intersects into this topic."), 
+        br(),
+    p("Using distant learning, I analyze 41 YA fiction novels 
+    published after 2000 that revolve around a mentally ill 
+    protagonist. I explored the portrayal of mental health -- 
+    the diction, sentiment, and topics -- and whether any patterns 
+    arise when comparing the novels based on positionality."),
+    br(),
+    p("Using the two tabs, you can look at positionality based off of 
+    authors or of protagonists. Note that, in all cases, the race
+    of the author aligned with the race of the protagonist, so
+    the collection of books utilized for the race-based analysis 
+    does not change whether chosen for author or protagonist 
+    positionality."), 
+    br(),
+    p("Note: Because not enough black male 
+    protagonists or authors exist in this genre, the black male positionality cannot stand alone as a analyzable positionality in the Gender and Race analysis. Black male novels are present in the Gender analysis and Race analysis respectively.")),
         tabPanel("Positionality of Author", plotOutput("plot_1")), 
         tabPanel("Positionality of Protagonist", plotOutput("plot_2")) #,
         #tabPanel("Sentiment Analysis of Each Novel", plotOutput("plot_3"))
@@ -148,33 +80,19 @@ ui <- fluidPage(
   
 
 server <- function(input, output, session) {
-  # #attempt at text outputs
-  # output$overview <- renderUI({
-  #  str1 <- paste("You have selected")
-  #  str2 <- paste("You have chosen a range that goes from")
-  #  HTML(paste(str1, str2, sep = '<br/>'))
-  #  # HTML('<h1>My First Heading</h1>',
-  #        # '<p>My first paragraph.</p>')
-  # })
-
-  
+ 
 #REACTIVE EXPRESSIONS
   
   
 #AUTHOR 
   
 #TOP WORDS AUTH 
-#   top_10_words_auth <- function(data_set) {
-#   data_set %>% 
-#   ggplot(aes(tot_freq, word)) +
-#   geom_col()
-# }
-# map(novel_list, top_10_words_graph_perc)
-  
-  
-  
-top_10_words_wm_auth <- reactive({
-    top_10_words_wm_auth %>% filter(positionality_choice == input$positionality_choice)
+#facet wrap instead of function, maybe adjust y axis scales = free
+
+top_10_words_auth <- reactive({
+    top_10_words %>% 
+    filter(positionality_choice == input$positionality_choice) %>%
+    filter(choice == "auth")
   })
   
      
@@ -199,25 +117,59 @@ sent_per_input_auth <- reactive({
   
 
 #Most common mental health words auth
-
-
-#Frequency of mental health terms in novel auth 
-
+top_10_mh_auth <- reactive({
+  top_10_mh %>%
+    filter(choice == "auth") %>%
+    filter(positionality_choice == input$positionality_choice)
+})
 
 #Frequency of derogatory mental health words auth
-
+derogperc_allwords_auth <- reactive ({
+  combo_remove_stop %>%
+    filter(choice == "auth") %>%
+    filter(positionality_choice == input$positionality_choice) %>%
+  inner_join(neg_mh) %>%
+  group_by(doc_id) %>%
+  summarise(positionality_of_df = positionality_of_df, 
+            neg_tot = n(), neg_perc = neg_tot / tot_words) %>%
+  ungroup() %>% distinct()
+})
 
 #Ratio of derogatory to non-derogatory words
-
+derog_nonderog_ratio_auth <- reactive({ 
+  combo_remove_stop %>%
+    filter(choice == "auth") %>%
+    filter(positionality_choice == input$positionality_choice) %>%
+  inner_join(MH) %>%
+  group_by(doc_id) %>%
+  summarise(positionality_of_df = positionality_of_df, word = word, 
+            mh_tot = n()) %>%
+  ungroup() %>% distinct() %>%
+  inner_join(neg_mh) %>%
+  group_by(doc_id) %>%
+  summarise(positionality_of_df = positionality_of_df,
+            neg_tot = n(), neg_perc = neg_tot / mh_tot, pos_perc = 1-neg_perc,
+            ratio = pos_perc - neg_perc) %>%
+  distinct()
+})
 
 #sentiment +-10 words around mental health words auth
+sentiment_around_mh_auth <- reactive({
+  sentiment_around_mh %>%
+    filter(choice == "auth") %>%
+    filter(positionality_choice == input$positionality_choice)
+})
 
 #-----------------------------------------------------------------------#
 
 #CHARACTER
 
 #top 10 words char
-
+top_10_words_char <- reactive({
+    top_10_words %>% 
+    filter(positionality_choice == input$positionality_choice) %>%
+    filter(choice == "char")
+  })
 
 #sent per char
 sent_per_input_char <- reactive({
@@ -239,18 +191,48 @@ sent_per_input_char <- reactive({
     })
 
 #Most common mental health words char
-
-
-#Frequency of mental health terms in novel char 
-
+top_10_mh_char <- reactive({
+  top_10_mh %>%
+    filter(choice == "char") %>%
+    filter(positionality_choice == input$positionality_choice)
+})
 
 #Frequency of derogatory mental health words char
-
+derogperc_allwords_char <- reactive ({
+  combo_remove_stop %>%
+    filter(choice == "char") %>%
+    filter(positionality_choice == input$positionality_choice) %>%
+  inner_join(neg_mh) %>%
+  group_by(doc_id) %>%
+  summarise(positionality_of_df = positionality_of_df, 
+            neg_tot = n(), neg_perc = neg_tot / tot_words) %>%
+  ungroup() %>% distinct()
+})
 
 #Ratio of derogatory to non-derogatory char
-
+derog_nonderog_ratio_char <- reactive({ 
+  combo_remove_stop %>%
+    filter(choice == "char") %>%
+    filter(positionality_choice == input$positionality_choice) %>%
+  inner_join(MH) %>%
+  group_by(doc_id) %>%
+  summarise(positionality_of_df = positionality_of_df, word = word, 
+            mh_tot = n()) %>%
+  ungroup() %>% distinct() %>%
+  inner_join(neg_mh) %>%
+  group_by(doc_id) %>%
+  summarise(positionality_of_df = positionality_of_df,
+            neg_tot = n(), neg_perc = neg_tot / mh_tot, pos_perc = 1-neg_perc,
+            ratio = pos_perc - neg_perc) %>%
+  distinct()
+})
 
 #sentiment +-10 words around mental health words char
+sentiment_around_mh_char <- reactive({
+  sentiment_around_mh %>%
+    filter(choice == "char") %>%
+    filter(positionality_choice == input$positionality_choice)
+})
 
 #------------------------------------------------------------------#
 
@@ -258,7 +240,10 @@ sent_per_input_char <- reactive({
 #AUTHOR  
   output$plot_1 <- renderPlot({
      if(input$viz_choice == "Most common words used") {
-       
+         ggplot(data = top_10_words_auth(), aes(tot_freq, word)) +
+         geom_col() +
+         facet_wrap(~ positionality_of_df) +
+         labs(title = "Top 10 Most Common Words by Positionality", subtitle = "Note: If a word was not in the top 10 most common words for a certain positionality, it will show up as 0% frequency.")
      } else { if (input$viz_choice == "Sentiment score per novel") {
        ggplot(data = sent_per_input_auth(),
        aes(x = positionality, y = perc, color = positionality)) +
@@ -273,7 +258,8 @@ sent_per_input_char <- reactive({
     size = 1,
     shape = 24,
     fill = "black"
-  )
+  ) +
+  theme_bw()
      }
       else { if (input$viz_choice == "NRC emotion percentages" ) {
        ggplot(data = nrc_auth(), aes(x=positionality, y=perc)) +
@@ -281,25 +267,92 @@ sent_per_input_char <- reactive({
   geom_col()
      }
       else { if (input$viz_choice == "Most common mental health words") {
-       #most_common_mh_auth()
+ ggplot(top_10_mh_auth(), aes(tot_freq, word)) +
+  geom_col() +
+  facet_wrap(~positionality_of_df)
      }
       else { if (input$viz_choice == "Frequency of mental health terms in novel") {
-       #freq_mh_auth()
+       MHcount %>%
+          filter(choice == "auth") %>%
+          filter(positionality_choice == input$positionality_choice) %>%
+  ggplot(aes(x= positionality_of_df, y=mh_perc, color = positionality_of_df)) +
+  geom_beeswarm(cex = 3) +
+  labs(x = "Positionality",
+       y = "Percentage of Mental Health Terms", color = "Positionality") + 
+  theme(legend.position = "none") +
+  scale_colour_brewer(palette = "Accent") +
+  stat_summary(
+    geom = "point",
+    fun = "mean",
+    col = "black",
+    size = 1,
+    shape = 24,
+    fill = "black"
+  ) +
+  theme_bw()
      }
-      else { if (input$viz_choice == "Ratio of derogatory to non-derogatory words") {
-       #ratio_derog_auth()
+      else { if (input$viz_choice == "Frequency of derogatory mental health words") {
+  ggplot(data = derogperc_allwords_auth(), aes(x= positionality_of_df, y=neg_perc, color = positionality_of_df)) +
+  geom_beeswarm(cex = 3) +
+  labs(x = "Positionality",
+       y = "Percentage of Derogatory Terms out of all Words", color = "Positionality") + 
+  theme(legend.position = "none") +
+  scale_colour_brewer(palette = "Accent") +
+  stat_summary(
+    geom = "point",
+    fun = "mean",
+    col = "black",
+    size = 1,
+    shape = 24,
+    fill = "black"
+  )+
+  theme_bw()
+      } else { if (input$viz_choice == "Ratio of derogatory to non-derogatory words") {
+       derog_nonderog_ratio_auth() %>%
+  ggplot(aes(x= positionality_of_df, y= ratio, color = positionality_of_df)) +
+  geom_beeswarm(cex = 3) +
+  labs(x = "Positionality",
+       y = "Ratio of non-derogatory (+) vs. derogatory(-) Terms", color = "Positionality") + 
+  theme(legend.position = "none") +
+  scale_colour_brewer(palette = "Accent") +
+  stat_summary(
+    geom = "point",
+    fun = "mean",
+    col = "black",
+    size = 1,
+    shape = 24,
+    fill = "black"
+  )+
+  theme_bw()
      }
       else { if (input$viz_choice == "Sentiment +-10 words around mental health words") {
-       #around_mh_auth()
+       ggplot(data = sentiment_around_mh_auth(), aes(x = positionality_of_df, y = sentiment, 
+                                       color = positionality_of_df)) +
+  geom_beeswarm(cex = 3) +
+  labs(x = "Positionality", y = "Sentiment Around Mental Health Terms", color = "Positionality") + 
+  theme(legend.position = "none") +
+  scale_colour_brewer(palette = "Accent") +
+  stat_summary(
+    geom = "point",
+    fun = "mean",
+    col = "black",
+    size = 1,
+    shape = 24,
+    fill = "black"
+  ) +
+  theme_bw()
      }
-     }}}}}}
+     }}}}}}}
      })
                 
 
 #CHARACTER
   output$plot_2 <- renderPlot({
      if(input$viz_choice == "Most common words used") {
-       
+       ggplot(data = top_10_words_char(), aes(tot_freq, word)) +
+         geom_col() +
+         facet_wrap(~ positionality_of_df) +
+         labs(title = "Top 10 Most Common Words by Positionality", subtitle = "Note: If a word was not in the top 10 most common words for a certain positionality, it will show up as 0% frequency.")
      } else { if (input$viz_choice == "Sentiment score per novel") {
        ggplot(data = sent_per_input_char(),
        aes(x = positionality, y = perc, color = positionality)) +
@@ -314,7 +367,8 @@ sent_per_input_char <- reactive({
     size = 1,
     shape = 24,
     fill = "black"
-  )
+  ) +
+  theme_bw()
      }
       else { if (input$viz_choice == "NRC emotion percentages" ) {
        ggplot(data = nrc_char(), aes(x=positionality, y=perc)) +
@@ -322,18 +376,83 @@ sent_per_input_char <- reactive({
   geom_col()
      }
       else { if (input$viz_choice == "Most common mental health words") {
-       #most_common_mh_auth()
+         ggplot(data = top_10_mh_char(), aes(n, word)) +
+  geom_col() +
+    facet_wrap(~positionality_of_df)
      }
      else { if (input$viz_choice == "Frequency of mental health terms in novel") {
-       #freq_mh_auth()
+       MHcount %>%
+          filter(choice == "char") %>%
+          filter(positionality_choice == input$positionality_choice) %>%
+  ggplot(aes(x= positionality_of_df, y=mh_perc, color = positionality_of_df)) +
+  geom_beeswarm(cex = 3) +
+  labs(x = "Positionality",
+       y = "Percentage of Mental Health Terms", color = "Positionality") + 
+  theme(legend.position = "none") +
+  scale_colour_brewer(palette = "Accent") +
+  stat_summary(
+    geom = "point",
+    fun = "mean",
+    col = "black",
+    size = 1,
+    shape = 24,
+    fill = "black"
+  )+
+  theme_bw()
      }
-      else { if (input$viz_choice == "Ratio of derogatory to non-derogatory words") {
-       #ratio_derog_auth()
+      else { if (input$viz_choice == "Frequency of derogatory mental health words") {
+  ggplot(data = derogperc_allwords_char(), aes(x= positionality_of_df, y=neg_perc, color = positionality_of_df)) +
+  geom_beeswarm(cex = 3) +
+  labs(x = "Positionality",
+       y = "Percentage of Derogatory Terms out of all Words", color = "Positionality") + 
+  theme(legend.position = "none") +
+  scale_colour_brewer(palette = "Accent") +
+  stat_summary(
+    geom = "point",
+    fun = "mean",
+    col = "black",
+    size = 1,
+    shape = 24,
+    fill = "black"
+  )+
+  theme_bw()
+      } else {
+        if (input$viz_choice == "Ratio of derogatory to non-derogatory words") {
+       derog_nonderog_ratio_char() %>%
+  ggplot(aes(x= positionality_of_df, y= ratio, color = positionality_of_df)) +
+  geom_beeswarm(cex = 3) +
+  labs(x = "Positionality",
+       y = "Ratio of non-derogatory (+) vs. derogatory(-) Terms", color = "Positionality") + 
+  theme(legend.position = "none") +
+  scale_colour_brewer(palette = "Accent") +
+  stat_summary(
+    geom = "point",
+    fun = "mean",
+    col = "black",
+    size = 1,
+    shape = 24,
+    fill = "black"
+  )+
+  theme_bw()
      }
       else { if (input$viz_choice == "Sentiment +-10 words around mental health words") {
-       #around_mh_auth()
+       ggplot(data = sentiment_around_mh_char(), aes(x = positionality_of_df, y = sentiment, 
+                                       color = positionality_of_df)) +
+  geom_beeswarm(cex = 3) +
+  labs(x = "Positionality", y = "Sentiment Around Mental Health Terms", color = "Positionality") + 
+  theme(legend.position = "none") +
+  scale_colour_brewer(palette = "Accent") +
+  stat_summary(
+    geom = "point",
+    fun = "mean",
+    col = "black",
+    size = 1,
+    shape = 24,
+    fill = "black"
+  ) +
+  theme_bw()
      }
-     }}}}}}
+     }}}}}}}
      })
 
  }
@@ -341,5 +460,4 @@ sent_per_input_char <- reactive({
 shinyApp(ui, server)
 
 ```
-
 

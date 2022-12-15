@@ -97,4 +97,8 @@ How to only graph certain graphs at a time -> solution was nested if else in bas
 
 12.9 Update
 
-How to integrate functions in app. 
+How to integrate functions in app. Solution: instead of mapping just do facet_wrap. create all dfs in text prep.
+
+FINAL UPDATE 12.14
+
+All graphs created. shiny app finished!

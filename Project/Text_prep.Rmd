@@ -1,3 +1,6 @@
+CHANGE THEME OF GRAPHS -- WHITE BACKGROUND 
+
+
 library 
 ```{r}
 library(readtext) #Needed for readtext
@@ -23,7 +26,8 @@ wm_nest <- wm_df %>%
 #unnest
 wm_unnest_auth <- wm_nest %>% 
   unnest_tokens(output = "word", input = "text") %>%
-  mutate(positionality_choice = "Gender and Race")
+  mutate(positionality_choice = "Gender and Race") %>%
+  mutate(positionality_of_df = "White Male")
 #remove stop words and punctuation
 wm <- anti_join(wm_unnest, stop_words, by = c("word" = "word"), .keep_all = true)
 wm <- wm %>% mutate(word = removePunctuation(word))
@@ -51,7 +55,8 @@ wf_nest <- wf_df %>%
 #unnest
 wf_unnest_auth <- wf_nest %>% 
   unnest_tokens(output = "word", input = "text") %>%
-  mutate(positionality_choice = "Gender and Race")
+  mutate(positionality_choice = "Gender and Race") %>%
+  mutate(positionality_of_df = "White Female")
 #remove stop words
 wf <- anti_join(wf_unnest, stop_words, by = c("word" = "word"), .keep_all = true)
 wf <- wf %>% mutate(word = removePunctuation(word))
@@ -79,7 +84,8 @@ bf_nest <- bf_df %>%
 #unnest
 bf_unnest_auth <- bf_nest %>% 
   unnest_tokens(output = "word", input = "text") %>%
-  mutate(positionality_choice = "Gender and Race")
+  mutate(positionality_choice = "Gender and Race")  %>%
+  mutate(positionality_of_df = "Black Female")
 #remove stop words
 bf <- anti_join(bf_unnest, stop_words, by = c("word" = "word"), .keep_all = true)
 bf <- bf %>% mutate(word = removePunctuation(word))
@@ -97,12 +103,12 @@ bf_auth <- bf %>% select(-id) %>% rename(lem = "bf_lem") %>%
 rm(wm_df, wm_lem_count, wf_df, wf_lem_count, bf_df, bf_lem_count, wm_nest, wf_nest, bf_nest)
 
 
-write.csv(wm_unnest_auth, "data/wm_unnest_auth")
-write.csv(wf_unnest_auth, "data/wf_unnest_auth")
-write.csv(bf_unnest_auth, "data/bf_unnest_auth")
-write.csv(wm_auth, "data/wm_auth")
-write.csv(wf_auth, "data/wf_auth")
-write.csv(bf_auth, "data/bf_auth")
+# write.csv(wm_unnest_auth, "data/wm_unnest_auth")
+# write.csv(wf_unnest_auth, "data/wf_unnest_auth")
+# write.csv(bf_unnest_auth, "data/bf_unnest_auth")
+# write.csv(wm_auth, "data/wm_auth")
+# write.csv(wf_auth, "data/wf_auth")
+# write.csv(bf_auth, "data/bf_auth")
 ```
 
 BY PROTAG POSITIONALITY
@@ -121,7 +127,8 @@ wm_nest <- wm_df %>%
 #unnest
 wm_unnest_char <- wm_nest %>% 
   unnest_tokens(output = "word", input = "text") %>%
-  mutate(positionality_choice = "Gender and Race")
+  mutate(positionality_choice = "Gender and Race")  %>%
+  mutate(positionality_of_df = "White Male")
 #remove stop words and punctuation
 wm <- anti_join(wm_unnest, stop_words, by = c("word" = "word"), .keep_all = true)
 wm <- wm %>% mutate(word = removePunctuation(word))
@@ -149,7 +156,8 @@ wf_nest <- wf_df %>%
 #unnest
 wf_unnest_char <- wf_nest %>% 
   unnest_tokens(output = "word", input = "text") %>%
-  mutate(positionality_choice = "Gender and Race")
+  mutate(positionality_choice = "Gender and Race")  %>%
+  mutate(positionality_of_df = "White Female")
 #remove stop words
 wf <- anti_join(wf_unnest, stop_words, by = c("word" = "word"), .keep_all = true)
 wf <- wf %>% mutate(word = removePunctuation(word))
@@ -177,7 +185,8 @@ bf_nest <- bf_df %>%
 #unnest
 bf_unnest_char <- bf_nest %>% 
   unnest_tokens(output = "word", input = "text") %>%
-  mutate(positionality_choice = "Gender and Race")
+  mutate(positionality_choice = "Gender and Race")  %>%
+  mutate(positionality_of_df = "Black Female")
 #remove stop words
 bf <- anti_join(bf_unnest, stop_words, by = c("word" = "word"), .keep_all = true)
 bf <- bf %>% mutate(word = removePunctuation(word))
@@ -195,12 +204,12 @@ bf_char <- bf %>% select(-id) %>% rename(lem = "bf_lem") %>%
 rm(wm_df, wm_lem_count, wf_df, wf_lem_count, bf_df, bf_lem_count, wm_nest, wf_nest, bf_nest)
 
 
-write.csv(wm_unnest, "data/wm_unnest_char")
-write.csv(wf_unnest, "data/wf_unnest_char")
-write.csv(bf_unnest, "data/bf_unnest_char")
-write.csv(wm, "data/wm_char")
-write.csv(wf, "data/wf_char")
-write.csv(bf, "data/bf_char")
+# write.csv(wm_unnest, "data/wm_unnest_char")
+# write.csv(wf_unnest, "data/wf_unnest_char")
+# write.csv(bf_unnest, "data/bf_unnest_char")
+# write.csv(wm, "data/wm_char")
+# write.csv(wf, "data/wf_char")
+# write.csv(bf, "data/bf_char")
 ```
 
 BY GENDER PROTOG
@@ -221,7 +230,8 @@ male_nest <- male %>%
 #unnest
 male_unnest_char <- male_nest %>% 
   unnest_tokens(output = "word", input = "text") %>%
-  mutate(positionality_choice = "Gender")
+  mutate(positionality_choice = "Gender")  %>%
+  mutate(positionality_of_df = "Male")
 #remove stop words and punctuation
 male <- anti_join(male_unnest, stop_words, by = c("word" = "word"), .keep_all = true)
 male <- male %>% mutate(word = removePunctuation(word))
@@ -250,7 +260,8 @@ fem_nest <- fem %>%
 #unnest
 fem_unnest_char <- fem_nest %>% 
   unnest_tokens(output = "word", input = "text") %>%
-  mutate(positionality_choice = "Gender")
+  mutate(positionality_choice = "Gender")  %>%
+  mutate(positionality_of_df = "Female")
 #remove stop words and punctuation
 fem <- anti_join(fem_unnest, stop_words, by = c("word" = "word"), .keep_all = true)
 fem <- fem %>% mutate(word = removePunctuation(word))
@@ -268,10 +279,10 @@ fem_char <- fem %>% select(-id) %>% rename(lem = "fem_lem") %>%
 rm(wm, male_lem_count, wf, fem_lem_count, bf, bm, male_nest, fem_nest)
 
 
-write.csv(fem_unnest_char, "data/fem_unnest_char")
-write.csv(male_unnest_char, "data/male_unnest_char")
-write.csv(fem_char, "data/fem_char")
-write.csv(male_char, "data/male_char")
+# write.csv(fem_unnest_char, "data/fem_unnest_char")
+# write.csv(male_unnest_char, "data/male_unnest_char")
+# write.csv(fem_char, "data/fem_char")
+# write.csv(male_char, "data/male_char")
 ```
 
 BY GENDER AUTH
@@ -292,7 +303,8 @@ male_nest <- male %>%
 #unnest
 male_unnest_auth <- male_nest %>% 
   unnest_tokens(output = "word", input = "text") %>%
-  mutate(positionality_choice = "Gender")
+  mutate(positionality_choice = "Gender")  %>%
+  mutate(positionality_of_df = "Male")
 #remove stop words and punctuation
 male <- anti_join(male_unnest, stop_words, by = c("word" = "word"), .keep_all = true)
 male <- male %>% mutate(word = removePunctuation(word))
@@ -321,7 +333,8 @@ fem_nest <- fem %>%
 #unnest
 fem_unnest_auth <- fem_nest %>% 
   unnest_tokens(output = "word", input = "text") %>%
-  mutate(positionality_choice = "Gender")
+  mutate(positionality_choice = "Gender")  %>%
+  mutate(positionality_of_df = "Female")
 #remove stop words and punctuation
 fem <- anti_join(fem_unnest, stop_words, by = c("word" = "word"), .keep_all = true)
 fem <- fem %>% mutate(word = removePunctuation(word))
@@ -339,10 +352,10 @@ fem_auth <- fem %>% select(-id) %>% rename(lem = "fem_lem") %>%
 rm(wm, male_lem_count, wf, fem_lem_count, bf, bm, fem_nest, male_nest)
 
 
-write.csv(fem_unnest_auth, "data/fem_unnest_auth")
-write.csv(male_unnest_auth, "data/male_unnest_auth")
-write.csv(fem_auth, "data/fem_auth")
-write.csv(male_auth, "data/male_auth")
+# write.csv(fem_unnest_auth, "data/fem_unnest_auth")
+# write.csv(male_unnest_auth, "data/male_unnest_auth")
+# write.csv(fem_auth, "data/fem_auth")
+# write.csv(male_auth, "data/male_auth")
 ```
 
 RACE
@@ -360,7 +373,9 @@ w_nest <- w_df %>%
   mutate(text = removeNumbers(text))
 #unnest
 w_unnest <- w_nest %>% 
-  unnest_tokens(output = "word", input = "text")
+  unnest_tokens(output = "word", input = "text")   %>%
+  mutate(positionality_choice = "Race") %>%
+  mutate(positionality_of_df = "White")
 #remove stop words and punctuation
 w <- anti_join(w_unnest, stop_words, by = c("word" = "word"), .keep_all = true)
 w <- w %>% mutate(word = removePunctuation(word))
@@ -371,7 +386,8 @@ w_lem <- w_lem %>%
   mutate(id = row_number()) 
 w_lem_count <- w %>% mutate(id = row_number())
 w <- full_join(w_lem, w_lem_count, by = c("id" = "id"))
-w <- w %>% select(-id) %>% rename(lem = "w_lem")
+w <- w %>% select(-id) %>% rename(lem = "w_lem") %>%
+  mutate(positionality_choice = "Race")
 
 #black  
 #read
@@ -386,7 +402,9 @@ b_nest <- b_df %>%
   mutate(text = removeNumbers(text))
 #unnest
 b_unnest <- b_nest %>% 
-  unnest_tokens(output = "word", input = "text")
+  unnest_tokens(output = "word", input = "text")%>%
+  mutate(positionality_choice = "Race") %>%
+  mutate(positionality_of_df = "Black")
 #remove stop words
 b <- anti_join(b_unnest, stop_words, by = c("word" = "word"), .keep_all = true)
 b <- b %>% mutate(word = removePunctuation(word))
@@ -397,16 +415,17 @@ b_lem <- b_lem %>%
   mutate(id = row_number()) 
 b_lem_count <- b %>% mutate(id = row_number())
 b <- full_join(b_lem, b_lem_count, by = c("id" = "id"))
-b <- b %>% select(-id) %>% rename(lem = "b_lem")
+b <- b %>% select(-id) %>% rename(lem = "b_lem") %>%
+  mutate(positionality_choice = "Race")
 
 #remove unneeded
 rm(w_df, w_lem_count, b_df, b_lem_count, b_nest, w_nest)
 
 
-write.csv(w_unnest, "data/w_unnest")
-write.csv(b_unnest, "data/b_unnest")
-write.csv(w, "data/w")
-write.csv(b, "data/b")
+# write.csv(w_unnest, "data/w_unnest")
+# write.csv(b_unnest, "data/b_unnest")
+# write.csv(w, "data/w")
+# write.csv(b, "data/b")
 ```
 
 
@@ -421,7 +440,7 @@ all_novels_auth_both <- bind_rows(wm_auth, wf_auth, bf_auth) %>%
   ungroup() %>%
   mutate(positionality_choice = "Gender and Race")
 
-all_novels_auth_gender <- bind_rows(fem_auth_gender, male_auth_gender) %>%
+all_novels_auth_gender <- bind_rows(fem_auth, male_auth) %>%
   group_by(doc_id) %>%
   mutate(id = row_number()) %>%
   mutate(tot_words = n()) %>%
@@ -444,7 +463,7 @@ all_novels_char_both <- bind_rows(wm_char, wf_char, bf_char) %>%
   ungroup() %>%
   mutate(positionality_choice = "Gender and Race")
 
-all_novels_char_gender <- bind_rows(fem_char_gender, male_char_gender) %>%
+all_novels_char_gender <- bind_rows(fem_char, male_char) %>%
   group_by(doc_id) %>%
   mutate(id = row_number()) %>%
   mutate(tot_words = n()) %>%
@@ -454,21 +473,22 @@ all_novels_char_gender <- bind_rows(fem_char_gender, male_char_gender) %>%
 all_novels_auth <- bind_rows(all_novels_auth_both, all_novels_auth_gender, all_novels_race)
 write.csv(all_novels_auth, "data/all_novels_auth")
 
-all_novels_char <- bind_rows(all_novels_char_both, all_novels_auth_gender, all_novels_race)
+all_novels_char <- bind_rows(all_novels_char_both, all_novels_char_gender, all_novels_race)
 write.csv(all_novels_char, "data/all_novels_char")
 
-novels_with_stop_list_race <- list(w_unnest, b_unnest)
-novels_with_stop_list_char_gender <- list(fem_unnest_char_gender, male_unnest_char_gender)
-novels_with_stop_list_char_both <- list(wm_unnest_char, wf_unnest_char, bf_unnest_char)
-novels_with_stop_list_auth_gender <- list(fem_unnest_auth_gender, male_unnest_auth_gender)
-novels_with_stop_list_auth_both <- list(wm_unnest_auth, wf_unnest_auth, bf_unnest_auth)
+novels_with_stop_auth <- bind_rows(w_unnest, b_unnest, fem_unnest_auth, male_unnest_auth, wm_unnest_auth, wf_unnest_auth, bf_unnest_auth) %>%
+  mutate(choice = "auth")
+novels_with_stop_char <- bind_rows(w_unnest, b_unnest, fem_unnest_char, male_unnest_char, wm_unnest_char, wf_unnest_char, bf_unnest_char) %>%
+  mutate(choice = "char")
+
+novels_with_stop <- bind_rows(novels_with_stop_auth, novels_with_stop_char)
 ```
 
 
 VISUALIZATIONS !!!
 ```{r}
 #Most common words used
-
+#AUTH
 top_10_words_wm_auth <- 
   wm_auth %>%
     count(doc_id, word) %>%
@@ -477,13 +497,14 @@ top_10_words_wm_auth <-
   ungroup() %>%
   group_by(word) %>%
     mutate(book_count = n()) %>%
-    filter(book_count>=2) %>% #tried 8 and keeps the same :)
+    filter(book_count>=8) %>% #tried 8 and keeps the same :)
     mutate(freq = n / tot_words) %>%
     group_by(word) %>%
     summarize(tot_freq = sum(freq)) %>%
   slice_max(tot_freq, n=10) %>%
   mutate(word = fct_reorder(.f = word, .x = tot_freq)) %>%
-  mutate(positionality_choice = "Gender and Race")
+  mutate(positionality_choice = "Gender and Race") %>%
+  mutate(positionality_of_df = "White Male")
 
 top_10_words_wf_auth <- 
   wf_auth %>%
@@ -493,82 +514,201 @@ top_10_words_wf_auth <-
   ungroup() %>%
   group_by(word) %>%
     mutate(book_count = n()) %>%
-    filter(book_count>=2) %>% #tried 8 and keeps the same :)
+    filter(book_count>=8) %>% #tried 8 and keeps the same :)
     mutate(freq = n / tot_words) %>%
     group_by(word) %>%
     summarize(tot_freq = sum(freq)) %>%
   slice_max(tot_freq, n=10) %>%
   mutate(word = fct_reorder(.f = word, .x = tot_freq)) %>%
-  mutate(positionality_choice = "Gender and Race")
+  mutate(positionality_choice = "Gender and Race") %>%
+  mutate(positionality_of_df = "White Female")
 
 top_10_words_bf_auth <- 
-  wm_auth %>%
+  bf_auth %>%
     count(doc_id, word) %>%
   group_by(doc_id) %>%
   mutate(tot_words = sum(n)) %>%
   ungroup() %>%
   group_by(word) %>%
     mutate(book_count = n()) %>%
-    filter(book_count>=2) %>% #tried 8 and keeps the same :)
+    filter(book_count>=8) %>% #tried 8 and keeps the same :)
     mutate(freq = n / tot_words) %>%
     group_by(word) %>%
     summarize(tot_freq = sum(freq)) %>%
   slice_max(tot_freq, n=10) %>%
   mutate(word = fct_reorder(.f = word, .x = tot_freq)) %>%
-  mutate(positionality_choice = "Gender and Race")
+  mutate(positionality_choice = "Gender and Race") %>%
+  mutate(positionality_of_df = "Black Female")
 
 top_10_words_fem_auth <- 
-  wm_auth %>%
+  fem_auth %>%
     count(doc_id, word) %>%
   group_by(doc_id) %>%
   mutate(tot_words = sum(n)) %>%
   ungroup() %>%
   group_by(word) %>%
     mutate(book_count = n()) %>%
-    filter(book_count>=2) %>% #tried 8 and keeps the same :)
+    filter(book_count>=8) %>% #tried 8 and keeps the same :)
     mutate(freq = n / tot_words) %>%
     group_by(word) %>%
     summarize(tot_freq = sum(freq)) %>%
   slice_max(tot_freq, n=10) %>%
   mutate(word = fct_reorder(.f = word, .x = tot_freq)) %>%
-  mutate(positionality_choice = "Gender and Race")
+  mutate(positionality_choice = "Gender") %>%
+  mutate(positionality_of_df = "Female")
 
-top_10_words_wf_auth <- 
-  wf_auth %>%
+top_10_words_male_auth <- 
+  male_auth %>%
     count(doc_id, word) %>%
   group_by(doc_id) %>%
   mutate(tot_words = sum(n)) %>%
   ungroup() %>%
   group_by(word) %>%
     mutate(book_count = n()) %>%
-    filter(book_count>=2) %>% #tried 8 and keeps the same :)
+    filter(book_count>=8) %>% #tried 8 and keeps the same :)
     mutate(freq = n / tot_words) %>%
     group_by(word) %>%
     summarize(tot_freq = sum(freq)) %>%
   slice_max(tot_freq, n=10) %>%
   mutate(word = fct_reorder(.f = word, .x = tot_freq)) %>%
-  mutate(positionality_choice = "Gender and Race")
+  mutate(positionality_choice = "Gender") %>%
+  mutate(positionality_of_df = "Male")
 
-top_10_words_bf_auth <- 
-  wm_auth %>%
+top_10_words_white <- 
+  w %>%
     count(doc_id, word) %>%
   group_by(doc_id) %>%
   mutate(tot_words = sum(n)) %>%
   ungroup() %>%
   group_by(word) %>%
     mutate(book_count = n()) %>%
-    filter(book_count>=2) %>% #tried 8 and keeps the same :)
+    filter(book_count>=8) %>% #tried 8 and keeps the same :)
     mutate(freq = n / tot_words) %>%
     group_by(word) %>%
     summarize(tot_freq = sum(freq)) %>%
   slice_max(tot_freq, n=10) %>%
   mutate(word = fct_reorder(.f = word, .x = tot_freq)) %>%
-  mutate(positionality_choice = "Gender and Race")
+  mutate(positionality_choice = "Race") %>%
+  mutate(positionality_of_df = "White")
 
-write.csv(top_10_words_wm_auth, "data/top_10_words_wm_auth")
-write.csv(top_10_words_wf_auth, "data/top_10_words_wf_auth")
-write.csv(top_10_words_bf_auth, "data/top_10_words_bf_auth")
+top_10_words_black <- 
+  b %>%
+    count(doc_id, word) %>%
+  group_by(doc_id) %>%
+  mutate(tot_words = sum(n)) %>%
+  ungroup() %>%
+  group_by(word) %>%
+    mutate(book_count = n()) %>%
+    filter(book_count>=8) %>% #tried 8 and keeps the same :)
+    mutate(freq = n / tot_words) %>%
+    group_by(word) %>%
+    summarize(tot_freq = sum(freq)) %>%
+  slice_max(tot_freq, n=10) %>%
+  mutate(word = fct_reorder(.f = word, .x = tot_freq)) %>%
+  mutate(positionality_choice = "Race") %>%
+  mutate(positionality_of_df = "Black")
 
+#CHAR
+
+top_10_words_wm_char <- 
+  wm_char %>%
+    count(doc_id, word) %>%
+  group_by(doc_id) %>%
+  mutate(tot_words = sum(n)) %>%
+  ungroup() %>%
+  group_by(word) %>%
+    mutate(book_count = n()) %>%
+    filter(book_count>=8) %>% #tried 8 and keeps the same :)
+    mutate(freq = n / tot_words) %>%
+    group_by(word) %>%
+    summarize(tot_freq = sum(freq)) %>%
+  slice_max(tot_freq, n=10) %>%
+  mutate(word = fct_reorder(.f = word, .x = tot_freq)) %>%
+  mutate(positionality_choice = "Gender and Race") %>%
+  mutate(positionality_of_df = "White Male")
+
+top_10_words_wf_char <- 
+  wf_char %>%
+    count(doc_id, word) %>%
+  group_by(doc_id) %>%
+  mutate(tot_words = sum(n)) %>%
+  ungroup() %>%
+  group_by(word) %>%
+    mutate(book_count = n()) %>%
+    filter(book_count>=8) %>% #tried 8 and keeps the same :)
+    mutate(freq = n / tot_words) %>%
+    group_by(word) %>%
+    summarize(tot_freq = sum(freq)) %>%
+  slice_max(tot_freq, n=10) %>%
+  mutate(word = fct_reorder(.f = word, .x = tot_freq)) %>%
+  mutate(positionality_choice = "Gender and Race") %>%
+  mutate(positionality_of_df = "White Female")
+
+top_10_words_bf_char <- 
+  bf_char %>%
+    count(doc_id, word) %>%
+  group_by(doc_id) %>%
+  mutate(tot_words = sum(n)) %>%
+  ungroup() %>%
+  group_by(word) %>%
+    mutate(book_count = n()) %>%
+    filter(book_count>=8) %>% #tried 8 and keeps the same :)
+    mutate(freq = n / tot_words) %>%
+    group_by(word) %>%
+    summarize(tot_freq = sum(freq)) %>%
+  slice_max(tot_freq, n=10) %>%
+  mutate(word = fct_reorder(.f = word, .x = tot_freq)) %>%
+  mutate(positionality_choice = "Gender and Race") %>%
+  mutate(positionality_of_df = "Black Female")
+
+top_10_words_fem_char <- 
+  fem_char %>%
+    count(doc_id, word) %>%
+  group_by(doc_id) %>%
+  mutate(tot_words = sum(n)) %>%
+  ungroup() %>%
+  group_by(word) %>%
+    mutate(book_count = n()) %>%
+    filter(book_count>=8) %>% #tried 8 and keeps the same :)
+    mutate(freq = n / tot_words) %>%
+    group_by(word) %>%
+    summarize(tot_freq = sum(freq)) %>%
+  slice_max(tot_freq, n=10) %>%
+  mutate(word = fct_reorder(.f = word, .x = tot_freq)) %>%
+  mutate(positionality_choice = "Gender") %>%
+  mutate(positionality_of_df = "Female")
+
+top_10_words_male_char <- 
+  male_char %>%
+    count(doc_id, word) %>%
+  group_by(doc_id) %>%
+  mutate(tot_words = sum(n)) %>%
+  ungroup() %>%
+  group_by(word) %>%
+    mutate(book_count = n()) %>%
+    filter(book_count>=8) %>% #tried 8 and keeps the same :)
+    mutate(freq = n / tot_words) %>%
+    group_by(word) %>%
+    summarize(tot_freq = sum(freq)) %>%
+  slice_max(tot_freq, n=10) %>%
+  mutate(word = fct_reorder(.f = word, .x = tot_freq)) %>%
+  mutate(positionality_choice = "Gender") %>%
+  mutate(positionality_of_df = "Male")
+
+#CREATE DFS
+top_10_words_auth <- bind_rows(top_10_words_wm_auth, top_10_words_wf_auth, top_10_words_bf_auth, top_10_words_fem_auth, top_10_words_male_auth, top_10_words_white, top_10_words_black) %>%
+  mutate(choice = "auth")
+
+
+top_10_words_char <- bind_rows(top_10_words_wm_char, top_10_words_wf_char, top_10_words_bf_char, top_10_words_fem_char, top_10_words_male_char, top_10_words_white, top_10_words_black) %>%
+  mutate(choice = "char")
+
+top_10_words <- bind_rows(top_10_words_auth, top_10_words_char)
+
+write.csv(top_10_words, "data/top_10_words")
+```
+
+```{r}
 #Sentiment score per novel
 auth_afinn <-
     all_novels_auth_both %>% 
@@ -743,8 +883,7 @@ pos_mh <- tibble(word=c("institutionalized", "therapy", "therapist", "psychiatri
 
 Fix 2 word mh terms
 ```{r}
-combo <- function(data_set) { 
-  combo_df <- data_set %>%
+combo <- novels_with_stop %>%
   mutate(next_word = lead(word)) %>%
   ungroup() %>%
   mutate(word =
@@ -781,74 +920,468 @@ combo <- function(data_set) {
                      word=="mental" & next_word=="patient" ~ "mentalpatient",
                      TRUE ~ word)) %>% #remove next word
     select(!next_word)
-  #remove stop words
-  combo_df <- anti_join(combo_df, stop_words, by = c("word" = "word"), .keep_all = true)
-  combo_df <- combo_df %>% mutate(word = removePunctuation(word)) %>%
+
+combo_with_stop <- combo %>% mutate(word = removePunctuation(word)) %>%
     group_by(doc_id) %>%
     mutate(id = row_number()) %>%
     mutate(tot_words = n()) %>%
     ungroup()
-}
-combo_list <- map(novels_with_stop_list, combo)
-combo <- bind_rows(combo_list)
 
-#combo with stop for 10+-
-combo_with_stop <- function(data_set) { 
-  combo_df <- data_set %>%
-  mutate(next_word = lead(word)) %>%
-  ungroup() %>%
-  mutate(word =
-           case_when(word=="mentally" & next_word=="challenged" ~ "mentallychallenged",
-                     word=="kill" & next_word=="yourself" ~ "killyourself", 
-                     word=="kill" & next_word=="myself" ~ "killmyself", 
-                     word=="kill" & next_word=="herself" ~ "killherself", 
-                     word=="kill" & next_word=="himself" ~ "killhimself",
-                     word=="multiple" & next_word=="personality" ~ "multiplepersonality",
-                     word=="mentally" & next_word=="ill" ~ "mentallyill",
-                     word=="mental" & next_word=="illness" ~ "mentalillness",
-                     word=="intrusive" & next_word=="thoughts" ~ "intrusivethoughts",
-                     word=="intrusive" & next_word=="thought" ~ "intrusivethought",
-                     word=="thought" & next_word=="spiral" ~ "thoughtspiral",
-                     word=="multiple" & next_word=="personality" ~ "multiplepersonality",
-                     word=="split" & next_word=="personality" ~ "splitpersonality",
-                     word=="borderline" & next_word=="personality" ~ "borderlinepersonality",
-                     word=="binge" & next_word=="eating" ~ "bingeeating",
-                     word=="self" & next_word=="harm" ~ "selfharm",
-                     word=="self" & next_word=="mutilation" ~ "selfmutilation",
-                     word=="self" & next_word=="injury" ~ "selfinjury",
-                     word=="self" & next_word=="harmers" ~ "selfharmers",
-                     word=="self" & next_word=="harmer" ~ "selfharmer",
-                     word=="mental" & next_word=="hospital" ~ "mentalhospital",
-                     word=="mental" & next_word=="institution" ~ "mentalinstitution",
-                     word=="obsessive" & next_word=="compulsive" ~ "obsessivecompulsive", 
-                     word=="shell" & next_word=="shock" ~ "shellshock",
-                     word=="survivors" & next_word=="guilt" ~ "survivorsguilt",
-                     word=="mental" & next_word=="case" ~ "mentalcase",
-                     word=="sleep" & next_word=="paralysis" ~ "sleepparalysis",
-                     word=="panic" & next_word=="attack" ~ "panicattack",
-                     word=="panic" & next_word=="disorder" ~ "panicdisorder",
-                     word=="antisocial" & next_word=="personality" ~ "antisocialpersonality",
-                     word=="mental" & next_word=="patient" ~ "mentalpatient",
-                     TRUE ~ word)) %>% #remove next word
-    select(!next_word)
-  #remove punctuation
-  combo_df <- combo_df %>% mutate(word = removePunctuation(word))
-}
-combo_with_stop_list <- map(novels_with_stop_list, combo_with_stop)
-combo_with_stop <- bind_rows(combo_with_stop_list)
+   #remove stop words
+combo_remove_stop <- anti_join(combo, stop_words, by = c("word" = "word"), .keep_all = true)
+combo_remove_stop <- combo_remove_stop %>% mutate(word = removePunctuation(word)) %>%
+    group_by(doc_id) %>%
+    mutate(id = row_number()) %>%
+    mutate(tot_words = n()) %>%
+    ungroup()
+
+MHcount <- combo_remove_stop %>%
+  inner_join(MH) %>%
+  group_by(doc_id) %>%
+  summarise(positionality_choice = positionality_choice, positionality_of_df = positionality_of_df,
+            choice = choice,
+            mh_tot = n(), mh_perc = mh_tot / tot_words) %>%
+  ungroup() %>% distinct()
+
+write.csv(MHcount, "data/MHcount")
+
+write.csv(combo_remove_stop, "data/combo_remove_stop")
+write.csv(combo_with_stop, "data/combo_with_stop")
 ```
 
 
 ```{r}
 #Most common mental health words
 
+top_10_mh_wm_auth <- combo_remove_stop %>%
+  filter(positionality_of_df == "White Male") %>%
+  filter(choice == "auth") %>%
+   count(doc_id, word) %>%
+  group_by(doc_id) %>%
+  mutate(tot_words = sum(n)) %>%
+  ungroup() %>%
+  group_by(word) %>%
+    mutate(book_count = n()) %>%
+     ungroup() %>%
+    filter(book_count>=2) %>%
+  inner_join(MH) %>%
+    mutate(freq = n / tot_words) %>%
+    group_by(word) %>%
+    summarize(tot_freq = sum(freq)) %>%
+  slice_max(tot_freq, n=10) %>%
+  mutate(word = fct_reorder(.f = word, .x = tot_freq)) %>%
+  mutate(positionality_choice = "Gender and Race") %>%
+  mutate(positionality_of_df = "White Male")
 
-#Frequency of mental health terms in novel
+top_10_mh_wf_auth <- combo_remove_stop %>%
+  filter(positionality_of_df == "White Female") %>%
+  filter(choice == "auth") %>%
+   count(doc_id, word) %>%
+  group_by(doc_id) %>%
+  mutate(tot_words = sum(n)) %>%
+  ungroup() %>%
+  group_by(word) %>%
+    mutate(book_count = n()) %>%
+     ungroup() %>%
+    filter(book_count>=2) %>%
+  inner_join(MH) %>%
+    mutate(freq = n / tot_words) %>%
+    group_by(word) %>%
+    summarize(tot_freq = sum(freq)) %>%
+  slice_max(tot_freq, n=10) %>%
+  mutate(word = fct_reorder(.f = word, .x = tot_freq))%>%
+  mutate(positionality_choice = "Gender and Race") %>%
+  mutate(positionality_of_df = "White Female")
+
+top_10_mh_bf_auth <- combo_remove_stop %>%
+  filter(positionality_of_df == "Black Female") %>%
+  filter(choice == "auth") %>%
+   count(doc_id, word) %>%
+  group_by(doc_id) %>%
+  mutate(tot_words = sum(n)) %>%
+  ungroup() %>%
+  group_by(word) %>%
+    mutate(book_count = n()) %>%
+     ungroup() %>%
+    filter(book_count>=2) %>%
+  inner_join(MH) %>%
+    mutate(freq = n / tot_words) %>%
+    group_by(word) %>%
+    summarize(tot_freq = sum(freq)) %>%
+  slice_max(tot_freq, n=10) %>%
+  mutate(word = fct_reorder(.f = word, .x = tot_freq))%>%
+  mutate(positionality_choice = "Gender and Race") %>%
+  mutate(positionality_of_df = "Black Female")
+
+top_10_mh_male_auth <- combo_remove_stop %>%
+  filter(positionality_of_df == "Male") %>%
+  filter(choice == "auth") %>%
+   count(doc_id, word) %>%
+  group_by(doc_id) %>%
+  mutate(tot_words = sum(n)) %>%
+  ungroup() %>%
+  group_by(word) %>%
+    mutate(book_count = n()) %>%
+     ungroup() %>%
+    filter(book_count>=2) %>%
+  inner_join(MH) %>%
+    mutate(freq = n / tot_words) %>%
+    group_by(word) %>%
+    summarize(tot_freq = sum(freq)) %>%
+  slice_max(tot_freq, n=10) %>%
+  mutate(word = fct_reorder(.f = word, .x = tot_freq))%>%
+  mutate(positionality_choice = "Gender") %>%
+  mutate(positionality_of_df = "Male")
+
+top_10_mh_fem_auth <- combo_remove_stop %>%
+  filter(positionality_of_df == "Female") %>%
+  filter(choice == "auth") %>%
+   count(doc_id, word) %>%
+  group_by(doc_id) %>%
+  mutate(tot_words = sum(n)) %>%
+  ungroup() %>%
+  group_by(word) %>%
+    mutate(book_count = n()) %>%
+     ungroup() %>%
+    filter(book_count>=2) %>%
+  inner_join(MH) %>%
+    mutate(freq = n / tot_words) %>%
+    group_by(word) %>%
+    summarize(tot_freq = sum(freq)) %>%
+  slice_max(tot_freq, n=10) %>%
+  mutate(word = fct_reorder(.f = word, .x = tot_freq)) %>%
+  mutate(positionality_choice = "Gender") %>%
+  mutate(positionality_of_df = "Female")
+
+top_10_mh_w <- combo_remove_stop %>%
+  filter(positionality_of_df == "White") %>%
+  filter(choice == "auth") %>%
+   count(doc_id, word) %>%
+  group_by(doc_id) %>%
+  mutate(tot_words = sum(n)) %>%
+  ungroup() %>%
+  group_by(word) %>%
+    mutate(book_count = n()) %>%
+     ungroup() %>%
+    filter(book_count>=2) %>%
+  inner_join(MH) %>%
+    mutate(freq = n / tot_words) %>%
+    group_by(word) %>%
+    summarize(tot_freq = sum(freq)) %>%
+  slice_max(tot_freq, n=10) %>%
+  mutate(word = fct_reorder(.f = word, .x = tot_freq)) %>%
+  mutate(positionality_choice = "Race") %>%
+  mutate(positionality_of_df = "White")
+
+top_10_mh_b <- combo_remove_stop %>%
+  filter(positionality_of_df == "Black") %>%
+  filter(choice == "auth") %>%
+   count(doc_id, word) %>%
+  group_by(doc_id) %>%
+  mutate(tot_words = sum(n)) %>%
+  ungroup() %>%
+  group_by(word) %>%
+    mutate(book_count = n()) %>%
+     ungroup() %>%
+    filter(book_count>=2) %>%
+  inner_join(MH) %>%
+    mutate(freq = n / tot_words) %>%
+    group_by(word) %>%
+    summarize(tot_freq = sum(freq)) %>%
+  slice_max(tot_freq, n=10) %>%
+  mutate(word = fct_reorder(.f = word, .x = tot_freq)) %>%
+  mutate(positionality_choice = "Race") %>%
+  mutate(positionality_of_df = "Black")
+
+top_10_mh_wm_char <- combo_remove_stop %>%
+  filter(positionality_of_df == "White Male") %>%
+  filter(choice == "char") %>%
+   count(doc_id, word) %>%
+  group_by(doc_id) %>%
+  mutate(tot_words = sum(n)) %>%
+  ungroup() %>%
+  group_by(word) %>%
+    mutate(book_count = n()) %>%
+     ungroup() %>%
+    filter(book_count>=2) %>%
+  inner_join(MH) %>%
+    mutate(freq = n / tot_words) %>%
+    group_by(word) %>%
+    summarize(tot_freq = sum(freq)) %>%
+  slice_max(tot_freq, n=10) %>%
+  mutate(word = fct_reorder(.f = word, .x = tot_freq)) %>%
+  mutate(positionality_choice = "Gender and Race") %>%
+  mutate(positionality_of_df = "White Male")
+
+top_10_mh_wf_char <- combo_remove_stop %>%
+  filter(positionality_of_df == "White Female") %>%
+  filter(choice == "char") %>%
+   count(doc_id, word) %>%
+  group_by(doc_id) %>%
+  mutate(tot_words = sum(n)) %>%
+  ungroup() %>%
+  group_by(word) %>%
+    mutate(book_count = n()) %>%
+     ungroup() %>%
+    filter(book_count>=2) %>%
+  inner_join(MH) %>%
+    mutate(freq = n / tot_words) %>%
+    group_by(word) %>%
+    summarize(tot_freq = sum(freq)) %>%
+  slice_max(tot_freq, n=10) %>%
+  mutate(word = fct_reorder(.f = word, .x = tot_freq)) %>%
+  mutate(positionality_choice = "Gender and Race") %>%
+  mutate(positionality_of_df = "White Female")
+
+top_10_mh_bf_char <- combo_remove_stop %>%
+  filter(positionality_of_df == "Black Female") %>%
+  filter(choice == "char") %>%
+   count(doc_id, word) %>%
+  group_by(doc_id) %>%
+  mutate(tot_words = sum(n)) %>%
+  ungroup() %>%
+  group_by(word) %>%
+    mutate(book_count = n()) %>%
+     ungroup() %>%
+    filter(book_count>=2) %>%
+  inner_join(MH) %>%
+    mutate(freq = n / tot_words) %>%
+    group_by(word) %>%
+    summarize(tot_freq = sum(freq)) %>%
+  slice_max(tot_freq, n=10) %>%
+  mutate(word = fct_reorder(.f = word, .x = tot_freq)) %>%
+  mutate(positionality_choice = "Gender and Race") %>%
+  mutate(positionality_of_df = "Black Female")
+
+top_10_mh_fem_char <- combo_remove_stop %>%
+  filter(positionality_of_df == "Female") %>%
+  filter(choice == "char") %>%
+   count(doc_id, word) %>%
+  group_by(doc_id) %>%
+  mutate(tot_words = sum(n)) %>%
+  ungroup() %>%
+  group_by(word) %>%
+    mutate(book_count = n()) %>%
+     ungroup() %>%
+    filter(book_count>=2) %>%
+  inner_join(MH) %>%
+    mutate(freq = n / tot_words) %>%
+    group_by(word) %>%
+    summarize(tot_freq = sum(freq)) %>%
+  slice_max(tot_freq, n=10) %>%
+  mutate(word = fct_reorder(.f = word, .x = tot_freq)) %>%
+  mutate(positionality_choice = "Gender") %>%
+  mutate(positionality_of_df = "Female")
+
+top_10_mh_male_char <- combo_remove_stop %>%
+  filter(positionality_of_df == "Male") %>%
+  filter(choice == "char") %>%
+   count(doc_id, word) %>%
+  group_by(doc_id) %>%
+  mutate(tot_words = sum(n)) %>%
+  ungroup() %>%
+  group_by(word) %>%
+    mutate(book_count = n()) %>%
+     ungroup() %>%
+    filter(book_count>=2) %>%
+  inner_join(MH) %>%
+    mutate(freq = n / tot_words) %>%
+    group_by(word) %>%
+    summarize(tot_freq = sum(freq)) %>%
+  slice_max(tot_freq, n=10) %>%
+  mutate(word = fct_reorder(.f = word, .x = tot_freq))%>%
+  mutate(positionality_choice = "Gender") %>%
+  mutate(positionality_of_df = "Male")
+
+#CREATE DFS
+top_10_mh_auth <- bind_rows(top_10_mh_wm_auth, top_10_mh_wf_auth, top_10_mh_bf_auth, top_10_mh_fem_auth, top_10_mh_male_auth, top_10_mh_w, top_10_mh_b) %>%
+  mutate(choice = "auth")
 
 
-#Ratio of derogatory to non-derogatory words
+top_10_mh_char <- bind_rows(top_10_mh_wm_char, top_10_mh_wf_char, top_10_mh_bf_char, top_10_mh_fem_char, top_10_mh_male_char, top_10_mh_w, top_10_mh_b) %>%
+  mutate(choice = "char")
 
+top_10_mh <- bind_rows(top_10_mh_auth, top_10_mh_char)
 
-#Sentiment +-10 words around mental health words 
+write.csv(top_10_mh, "data/top_10_mh")
 ```
 
++- 10
+```{r}
+target10=c("insane", "lobotomy", "hysteria", "electroshock", "lunatic", "psychotic", "nuts", "crazy", "deranged", "demented", "asylum", "loony", "retarded", "retard", "freak", "madness", "hydrotherapy", "delirious", "sociopath", "sociopathic", "disturbed", "psycho", "mad", "weird", "spastic", "halfwit", "meltdown", "outcast", "nutty", "killyourself", "killmyself", "killherself", "killhimself", "perverted", "spaz", "strange", "twisted", "weirdo", "psychopath", "psychopathic", "institutionalized", "therapy", "therapist", "psychiatrist", "psychiatric", "medication", "suicidal", "suicide", "mentallyill", "mentalillness", "diagnosis", "depression", "depressed", "anxiety", "anxieties", "psychosis", "dissociate", "dissociated", "dissociation", "intrusivethought", "intrusivethoughts", "thoughtspiral", "sleepparalysis", "multiplepersonality", "splitpersonality", "dissociative", "bipolar", "bpd", "borderlinepersonality", "schizophrenia", "schizophrenic", "ptsd", "dsm", "mentaldisorder", "mentalhealth", "anorexia", "bulimia", "bingeeating", "manic", "autism", "hallucinations", "hallucination", "ocd", "psychoanalysis", "trigger", "panicattack", "panicdisorder", "coping", "compulsion", "antisocialpersonality",  "selfharm", "selfmutilation", "selfinjury", "selfharmers", "selfharmer", "straitjacket", "mentalhospital", "mentalinstitution", "depersonalization", "obsessivecompulsive", "psychiatry", "delirium", "mania", "melancholia", "monomania", "traumatic", "trauma", "cutter", "cutting", "schizo", "delusional", "alters", "shellshock", "insomnia", "neurosis", "neurotic", "delusions", "survivorsguilt", "mentalcase", "agoraphobia", "mentallychallenged", "abnormal", "mentalpatient")
+
+combo_with_stop_gender_auth <- combo_with_stop %>% filter(choice == "auth") %>% filter(positionality_choice == "Gender")
+
+combo_with_stop_both_auth <- combo_with_stop %>% filter(choice == "auth") %>% filter(positionality_choice == "Gender and Race")
+
+combo_with_stop_both_char <- combo_with_stop %>% filter(choice == "char") %>% filter(positionality_choice == "Gender and Race")
+
+combo_with_stop_gender_char <- combo_with_stop %>% filter(choice == "auth") %>% filter(positionality_choice == "Gender")
+
+combo_with_stop_race <- combo_with_stop %>% filter(choice == "auth") %>% filter(positionality_choice == "Race")
+
+#doc names and count
+docs_gender_auth = unique(combo_with_stop_gender_auth$doc_id)
+ndoc_gender_auth = length(unique(combo_with_stop_gender_auth$doc_id))
+#for loop for 10 words around csvs
+for (i in 1:ndoc_gender_auth){
+  #full data
+  test <- combo_with_stop_gender_auth %>%
+  #subset data set into current doc
+    filter(doc_id == docs_gender_auth[i]) %>%
+  #build 10 word lead/lag
+    mutate(ten_words = case_when(word %in% target10 ~ paste(
+      lag(word, 10), lag(word, 9),lag(word, 8), lag(word, 7), lag(word, 6), lag(word, 5), lag(word, 4), lag(word, 3), lag(word, 2), lag(word), 
+      lead(word), lead(word, 2), lead(word, 3), lead(word, 4), lead(word, 5), lead(word, 6), lead(word, 7), lead(word, 8), lead(word, 9), lead(word, 10)))) %>%
+    drop_na(ten_words)
+  #save to file
+  filename = paste("10_words_gender_auth/", docs_gender_auth[i], "_10_words.csv", sep = "")
+  write_csv(x = test, file = filename)
+}
+
+#sentiment
+sentiment_around_mh_gender_auth <- readtext("10_words_gender_auth", cache=FALSE) %>%
+  select(!doc_id) %>%
+  rename(doc_id = "text") %>% 
+  select(!word) %>%
+  unnest_tokens(output = "word", input = "ten_words") %>%
+   inner_join(get_sentiments("bing")) %>%
+  count(doc_id, positionality_of_df, sentiment) %>%
+  spread(sentiment, n, fill=0) %>%
+  mutate(sentiment = positive - negative) %>%
+  mutate(positionality_choice = "Gender")
+
+#doc names and count
+docs_gender_char = unique(combo_with_stop_gender_char$doc_id)
+ndoc_gender_char = length(unique(combo_with_stop_gender_char$doc_id))
+#for loop for 10 words around csvs
+for (i in 1:ndoc_gender_char){
+  #full data
+  test <- combo_with_stop_gender_char %>%
+  #subset data set into current doc
+    filter(doc_id == docs_gender_char[i]) %>%
+  #build 10 word lead/lag
+    mutate(ten_words = case_when(word %in% target10 ~ paste(
+      lag(word, 10), lag(word, 9),lag(word, 8), lag(word, 7), lag(word, 6), lag(word, 5), lag(word, 4), lag(word, 3), lag(word, 2), lag(word), 
+      lead(word), lead(word, 2), lead(word, 3), lead(word, 4), lead(word, 5), lead(word, 6), lead(word, 7), lead(word, 8), lead(word, 9), lead(word, 10)))) %>%
+    drop_na(ten_words)
+  #save to file
+  filename = paste("10_words_gender_char/", docs_gender_char[i], "_10_words.csv", sep = "")
+  write_csv(x = test, file = filename)
+}
+
+#sentiment
+sentiment_around_mh_gender_char <- readtext("10_words_gender_char", cache=FALSE) %>%
+  select(!doc_id) %>%
+  rename(doc_id = "text") %>% 
+  select(!word) %>%
+  unnest_tokens(output = "word", input = "ten_words") %>%
+   inner_join(get_sentiments("bing")) %>%
+  count(doc_id, positionality_of_df, sentiment) %>%
+  spread(sentiment, n, fill=0) %>%
+  mutate(sentiment = positive - negative) %>%
+  mutate(positionality_choice = "Gender")
+
+#doc names and count
+docs_both_auth = unique(combo_with_stop_both_auth$doc_id)
+ndoc_both_auth = length(unique(combo_with_stop_both_auth$doc_id))
+#for loop for 10 words around csvs
+for (i in 1:ndoc_both_auth){
+  #full data
+  test <- combo_with_stop_both_auth %>%
+  #subset data set into current doc
+    filter(doc_id == docs_both_auth[i]) %>%
+  #build 10 word lead/lag
+    mutate(ten_words = case_when(word %in% target10 ~ paste(
+      lag(word, 10), lag(word, 9),lag(word, 8), lag(word, 7), lag(word, 6), lag(word, 5), lag(word, 4), lag(word, 3), lag(word, 2), lag(word), 
+      lead(word), lead(word, 2), lead(word, 3), lead(word, 4), lead(word, 5), lead(word, 6), lead(word, 7), lead(word, 8), lead(word, 9), lead(word, 10)))) %>%
+    drop_na(ten_words)
+  #save to file
+  filename = paste("10_words_both_auth/", docs_both_auth[i], "_10_words.csv", sep = "")
+  write_csv(x = test, file = filename)
+}
+
+#sentiment
+sentiment_around_mh_both_auth <- readtext("10_words_both_auth", cache=FALSE) %>%
+  select(!doc_id) %>%
+  rename(doc_id = "text") %>% 
+  select(!word) %>%
+  unnest_tokens(output = "word", input = "ten_words") %>%
+   inner_join(get_sentiments("bing")) %>%
+  count(doc_id, positionality_of_df, sentiment) %>%
+  spread(sentiment, n, fill=0) %>%
+  mutate(sentiment = positive - negative) %>%
+  mutate(positionality_choice = "Gender and Race")
+
+#doc names and count
+docs_both_char = unique(combo_with_stop_both_char$doc_id)
+ndoc_both_char = length(unique(combo_with_stop_both_char$doc_id))
+#for loop for 10 words around csvs
+for (i in 1:ndoc_both_char){
+  #full data
+  test <- combo_with_stop_both_char %>%
+  #subset data set into current doc
+    filter(doc_id == docs_both_char[i]) %>%
+  #build 10 word lead/lag
+    mutate(ten_words = case_when(word %in% target10 ~ paste(
+      lag(word, 10), lag(word, 9),lag(word, 8), lag(word, 7), lag(word, 6), lag(word, 5), lag(word, 4), lag(word, 3), lag(word, 2), lag(word), 
+      lead(word), lead(word, 2), lead(word, 3), lead(word, 4), lead(word, 5), lead(word, 6), lead(word, 7), lead(word, 8), lead(word, 9), lead(word, 10)))) %>%
+    drop_na(ten_words)
+  #save to file
+  filename = paste("10_words_both_char/", docs_both_char[i], "_10_words.csv", sep = "")
+  write_csv(x = test, file = filename)
+}
+
+#sentiment
+sentiment_around_mh_both_char <- readtext("10_words_both_char", cache=FALSE) %>%
+  select(!doc_id) %>%
+  rename(doc_id = "text") %>% 
+  select(!word) %>%
+  unnest_tokens(output = "word", input = "ten_words") %>%
+   inner_join(get_sentiments("bing")) %>%
+  count(doc_id, positionality_of_df, sentiment) %>%
+  spread(sentiment, n, fill=0) %>%
+  mutate(sentiment = positive - negative) %>%
+  mutate(positionality_choice = "Gender and Race")
+
+#doc names and count
+docs_race = unique(combo_with_stop_race$doc_id)
+ndoc_race = length(unique(combo_with_stop_race$doc_id))
+#for loop for 10 words around csvs
+for (i in 1:ndoc_race){
+  #full data
+  test <- combo_with_stop_race %>%
+  #subset data set into current doc
+    filter(doc_id == docs_race[i]) %>%
+  #build 10 word lead/lag
+    mutate(ten_words = case_when(word %in% target10 ~ paste(
+      lag(word, 10), lag(word, 9),lag(word, 8), lag(word, 7), lag(word, 6), lag(word, 5), lag(word, 4), lag(word, 3), lag(word, 2), lag(word), 
+      lead(word), lead(word, 2), lead(word, 3), lead(word, 4), lead(word, 5), lead(word, 6), lead(word, 7), lead(word, 8), lead(word, 9), lead(word, 10)))) %>%
+    drop_na(ten_words)
+  #save to file
+  filename = paste("10_words_race/", docs_race[i], "_10_words.csv", sep = "")
+  write_csv(x = test, file = filename)
+}
+
+#sentiment
+sentiment_around_mh_race <- readtext("10_words_race", cache=FALSE) %>%
+  select(!doc_id) %>%
+  rename(doc_id = "text") %>% 
+  select(!word) %>%
+  unnest_tokens(output = "word", input = "ten_words") %>%
+   inner_join(get_sentiments("bing")) %>%
+  count(doc_id, positionality_of_df, sentiment) %>%
+  spread(sentiment, n, fill=0) %>%
+  mutate(sentiment = positive - negative) %>%
+  mutate(positionality_choice = "Race") 
+
+sentiment_around_mh_auth <- bind_rows(sentiment_around_mh_gender_auth, sentiment_around_mh_both_auth, sentiment_around_mh_race) %>%
+  mutate(choice = "auth")
+
+sentiment_around_mh_char <- bind_rows(sentiment_around_mh_gender_char, sentiment_around_mh_both_char, sentiment_around_mh_race) %>%
+  mutate(choice = "char")
+
+sentiment_around_mh <- bind_rows(sentiment_around_mh_auth, sentiment_around_mh_char)
+
+write.csv(sentiment_around_mh, "data/sentiment_around_mh")
+```
